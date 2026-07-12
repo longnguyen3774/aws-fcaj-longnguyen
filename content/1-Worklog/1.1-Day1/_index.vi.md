@@ -1,141 +1,111 @@
 ---
 title: "Ngày 1"
-date: 2026-06-01
+date: 2026-05-15
 weight: 1
 chapter: false
 pre: " <b> 1.1. </b> "
 ---
 
-# Nhật Ký Làm Việc: Khởi Tạo Tài Khoản, Tích Lũy Credit và Thực Hành Các Dịch Vụ Cốt Lõi
+# Nhật Ký Làm Việc: Xây Dựng & Huấn Luyện Mô Hình Với SageMaker, Lưu Trữ Dữ Liệu Trên S3 Và Triển Khai API Trên EC2
 
-> **Ngày 1 - Thứ Hai, ngày 01/06/2026:** Kích hoạt tài khoản học tập AWS, nhận credit khởi đầu và hoàn thành 5 bài thực hành hướng dẫn trên console để nhận thêm credit khuyến mãi.
+> **Ngày 1 - Thứ Sáu, ngày 15/05/2026:** Tập trung cấu hình môi trường xây dựng và huấn luyện mô hình máy học bằng Amazon SageMaker, quản lý tập dữ liệu cùng artifact qua Amazon S3, và triển khai mô hình hoàn chỉnh thành một API production trên máy chủ Amazon EC2.
 
 ---
 
 ### Mục tiêu học tập trong ngày
 
-- Đăng ký thành công tài khoản AWS cá nhân và nhận **$100 credit ban đầu** từ chương trình.
-- Thực hiện **5 bài thực hành hướng dẫn** trên AWS Console để kiếm thêm **$100 credit** ($20 cho mỗi bài hoàn thành).
-- Trực tiếp làm quen với giao diện và cách hoạt động của 5 dịch vụ AWS cơ bản: EC2, Bedrock, Budgets, Lambda, và RDS.
-- Hiểu rõ nguyên tắc quản lý chi phí và quy trình dọn dẹp tài nguyên sau khi thực hành.
+- Khởi tạo và cấu hình **Amazon SageMaker** notebook instance để xây dựng, huấn luyện và đánh giá mô hình học máy.
+- Sử dụng **Amazon S3** như một giải pháp lưu trữ bảo mật, độ bền vững cao cho các tập dữ liệu thô và các artifact (trọng số) của mô hình.
+- Triển khai mô hình đã huấn luyện thành một **API endpoint trên Amazon EC2** bằng cách sử dụng một framework web mã nguồn mở (FastAPI/Flask).
+- Thiết lập quyền truy cập tài nguyên (IAM) và cấu hình mạng để đảm bảo sự tích hợp an toàn, liền mạch giữa SageMaker, S3 và EC2.
 
 ---
 
-### Task 1: Khởi tạo máy chủ ảo EC2 (Nhận +$20 Credit)
+### Quy Trình Làm Việc Với Máy Học Trên Amazon SageMaker
 
-**Mục tiêu:** Khởi tạo, kiểm tra và quản lý một máy chủ ảo (Virtual Machine) trên hạ tầng AWS.
+#### 1. Thiết lập môi trường và Notebook
+- Khởi tạo một SageMaker Notebook Instance (sử dụng dòng `ml.t3.medium`) đóng vai trò làm môi trường phát triển thử nghiệm tập trung.
+- Gắn IAM Execution Role với các quyền hạn cụ thể (`AmazonSageMakerFullAccess`), cho phép dịch vụ SageMaker tự động đọc dữ liệu huấn luyện từ S3 và ghi ngược kết quả lại S3.
 
-**Giới thiệu dịch vụ:** **Amazon EC2 (Elastic Compute Cloud)** cung cấp tài nguyên điện toán đám mây có thể mở rộng, cho phép người dùng cấu hình hệ điều hành, RAM, CPU và các thiết lập bảo mật mạng linh hoạt.
-
-**Quy trình thực hiện:**
-1. Trên giao diện **AWS Console** → tìm widget **Explore AWS** ở trang chủ → chọn bài thực hành **Launch an instance using EC2**.
-2. Chọn **Start activity** để bắt đầu lab.
-3. Cấu hình máy chủ ảo:
-   - Tên máy chủ (Name tag): `FCA-Test-Server`
-   - Hệ điều hành (AMI): Chọn Amazon Linux 2023 (thuộc diện Free Tier).
-   - Cấu hình phần cứng: Giữ cấu hình mặc định siêu nhỏ (`t2.micro` hoặc `t3.micro`).
-4. Tạo cặp khóa bảo mật (Key Pair) để kết nối từ xa:
-   - Tên khóa: `fca-keypair`
-   - Loại khóa: **RSA**
-   - Định dạng tệp: **.pem** (tải về lưu trữ an toàn trên máy cá nhân).
-5. Tạo Nhóm bảo mật (Security Group) với các quy tắc tường lửa mặc định.
-6. Xác nhận lại toàn bộ thông tin cấu hình và nhấn **Launch Instance**.
-7. **Bước kiểm tra:** Truy cập danh sách EC2 để xác nhận máy chủ đã chuyển sang trạng thái **Running** và vượt qua cả **2/2 status checks**.
-8. **Dọn dẹp hệ thống (Bắt buộc):** Chọn máy chủ vừa tạo → Instance State → Chọn **Terminate Instance** để xóa bỏ hoàn toàn máy ảo này.
-
-> **Bài học kinh nghiệm:** Việc khởi tạo tài nguyên rất nhanh chóng nhưng sẽ tính phí liên tục. Sau khi kiểm tra xong, cần terminate máy chủ ngay lập tức và đảm bảo ổ cứng EBS đi kèm cũng được xóa để tránh phát sinh chi phí ngoài ý muốn.
+#### 2. Đường ống xây dựng & Huấn luyện mô hình (Training Pipeline)
+- Viết các đoạn mã tiền xử lý dữ liệu, làm sạch và chuẩn hóa các đặc trưng (features) trước khi đưa vào huấn luyện.
+- Sử dụng các thuật toán tích hợp sẵn của SageMaker (hoặc custom Docker container) để thực thi tiến trình huấn luyện (Training Job).
+- Giám sát các chỉ số hiệu năng (loss, accuracy) theo thời gian thực thông qua hệ thống Log của SageMaker được tích hợp trực tiếp với Amazon CloudWatch.
+- Đóng gói file mô hình đã tối ưu dưới dạng nén (`model.tar.gz`) và tự động đẩy về bucket S3 được chỉ định sẵn sau khi hoàn tất.
 
 ---
 
-### Task 2: Thử nghiệm Promt trên Bedrock Playground (Nhận +$20 Credit)
+### Quản Lý Vòng Đời Dữ Liệu & Artifact Trên Amazon S3
 
-**Mục tiêu:** Trải nghiệm khả năng tương tác với các mô hình trí tuệ nhân tạo (Generative AI) trên hạ tầng AWS.
+#### 1. Cấu trúc Bucket và Phân lớp lưu trữ
+Để hỗ trợ toàn diện cho vòng đời phát triển dự án AI/ML, tôi cấu hình cấu trúc thư mục (Prefix) trong S3 Bucket một cách khoa học:
 
-**Giới thiệu dịch vụ:** **Amazon Bedrock** cung cấp giao thức kết nối thống nhất đến các mô hình ngôn ngữ lớn (LLM) hàng đầu từ các nhà phát triển lớn (như Anthropic, Meta, Cohere) thông qua API mà không đòi hỏi người dùng quản lý phần cứng.
+| Đường dẫn / Thư mục | Loại dữ liệu lưu trữ | Lớp lưu trữ (Storage Class) | Ý nghĩa và mục đích |
+|---|---|---|---|
+| `/raw-data/` | Tập dữ liệu gốc | S3 Standard | Độ trễ thấp, phục vụ truy cập đọc/ghi liên tục khi khám phá dữ liệu. |
+| `/processed-data/` | Dữ liệu đã xử lý | S3 Standard | Dữ liệu sạch đã sẵn sàng để nạp vào các tiến trình huấn luyện. |
+| `/model-artifacts/` | File `model.tar.gz` | S3 Standard | Thư mục chứa các tệp trọng số mô hình sau khi train xong. |
 
-**Quy trình thực hiện:**
-1. Truy cập **Amazon Bedrock Console** → chọn bài thực hành **Use a foundation model in Amazon Bedrock**.
-2. Tìm đến mục đăng ký quyền truy cập mô hình và chọn **Claude 3 Haiku** (mô hình có tốc độ phản hồi nhanh và tối ưu chi phí).
-3. Nếu hệ thống báo chưa được phân quyền, thực hiện điền thông tin mô tả mục đích sử dụng (Use case) ngắn gọn và gửi yêu cầu kích hoạt.
-4. Khi quyền truy cập đã được duyệt, vào giao diện **Text Playground** và chọn mô hình **Claude 3 Haiku**.
-5. Nhập nội dung thử nghiệm (ví dụ: "Tóm tắt 3 lợi ích cốt lõi của điện toán đám mây") và chọn **Run**.
-6. Theo dõi kết quả phản hồi, thử thay đổi thông số cấu hình như Temperature (độ sáng tạo của văn bản) và nhấn **Finish** để hoàn tất nhiệm vụ.
-
-> **Bài học kinh nghiệm:** Việc truy cập các mô hình AI trên AWS yêu cầu tuân thủ chính sách AI có trách nhiệm (Responsible AI). Việc cung cấp lý do sử dụng rõ ràng sẽ giúp yêu cầu mở khóa dịch vụ được phê duyệt nhanh chóng hơn.
-
----
-
-### Task 3: Cấu hình hạn mức chi tiêu với AWS Budgets (Nhận +$20 Credit)
-
-**Mục tiêu:** Xây dựng hàng rào cảnh báo chi phí tự động để kiểm soát lượng credit được cấp.
-
-**Giới thiệu dịch vụ:** **AWS Budgets** giám sát chi phí sử dụng dịch vụ và tự động gửi thông báo qua Email hoặc SMS khi chi phí thực tế hoặc dự báo vượt quá hạn mức thiết lập.
-
-**Quy trình thực hiện:**
-1. Vào **AWS Billing Console** → chọn mục **Budgets** → chọn bài thực hành **Set up a cost budget using AWS Budgets**.
-2. Nhấn **Start activity** để mở trình hướng dẫn tạo ngân sách.
-3. Thiết lập thông số:
-   - Loại ngân sách: Cost Budget (Theo dõi chi phí).
-   - Chu kỳ: Monthly (Hàng tháng).
-   - Hạn mức ngân sách (Budgeted Amount): $20.00.
-4. Cài đặt ngưỡng cảnh báo:
-   - Thiết lập gửi cảnh báo khi chi phí thực tế chạm mức **80% ($16.00)** của hạn mức.
-   - Nhập địa chỉ email cá nhân để nhận thông báo khẩn cấp.
-5. Kiểm tra thông tin cấu hình và nhấn **Create budget** để kích hoạt.
-
-> **Bài học kinh nghiệm:** Cấu hình ngân sách là bước bảo vệ tài khoản đầu tiên cần làm. Cảnh báo sớm giúp phát hiện kịp thời các dịch vụ chạy ngầm trước khi chúng tiêu thụ hết số credit của tài khoản.
+#### 2. Kiểm soát an toàn và Độ bền vững dữ liệu
+- Tận dụng cam kết độ bền vững dữ liệu lên đến **99.999999999% (11 số 9)** của Amazon S3 để đảm bảo các tệp mô hình quan trọng không bị thất lạc hoặc hư hỏng.
+- Áp dụng chính sách **S3 Bucket Policy** nghiêm ngặt, chỉ cho phép duy ứng dụng SageMaker (khi train) và máy chủ EC2 (khi deploy) quyền truy xuất dữ liệu.
 
 ---
 
-### Task 4: Triển khai Web App không máy chủ với AWS Lambda (Nhận +$20 Credit)
+### Triển Khai API Mô Hình Trên Máy Chủ Amazon EC2
 
-**Mục tiêu:** Lập trình và chạy mã nguồn ứng dụng trên mô hình Serverless.
+#### 1. Khởi tạo và cấu hình máy chủ EC2
+- Khởi chạy một phiên bản máy chủ ảo Amazon EC2 (`t3.medium` hoặc `c6i.large` tùy thuộc vào kích thước cấu trúc của mô hình) chạy hệ điều hành Amazon Linux 2023.
+- Cấu hình nhóm bảo mật **Security Group** để mở cổng nhận các traffic web tiêu chuẩn (`80`, `443`) và cổng chạy ứng dụng API tùy chỉnh (`8000`).
 
-**Giới thiệu dịch vụ:** **AWS Lambda** thực thi mã nguồn dựa trên sự kiện kích hoạt (như yêu cầu HTTP) và tự động quản lý hạ tầng phần cứng bên dưới. Chi phí chỉ tính trên thời gian xử lý thực tế, khi không có yêu cầu hệ thống sẽ không tốn phí.
-
-**Quy trình thực hiện:**
-1. Truy cập **AWS Lambda Console** → chọn bài thực hành **Create a web app using AWS Lambda**.
-2. Nhấp **Start activity** → chọn **Use a blueprint** (sử dụng mẫu dựng sẵn) → tìm mẫu **Getting started with Lambda HTTP**.
-3. Cấu hình hàm xử lý:
-   - Tên hàm (Function name): `fca-http-lambda-app`
-   - Đánh dấu đồng ý tạo vai trò IAM mới với các quyền cơ bản phục vụ thực thi hàm.
-4. Nhấn **Create function** và chờ hệ thống triển khai xong.
-5. **Kiểm tra hoạt động:** Sao chép đường dẫn **Function URL** được cấp, mở tab mới trên trình duyệt và dán vào để kiểm tra xem hàm có trả về chuỗi kết quả chào mừng định dạng JSON hay không.
-6. **Dọn dẹp:** Thực hiện xóa hàm (Delete) để làm sạch không gian làm việc.
-
-> **Bài học kinh nghiệm:** Serverless giúp lập trình viên không cần bận tâm đến việc vá lỗi hay cấu hình hệ điều hành máy chủ. Khi không có lượt truy cập, chi phí vận hành ứng dụng sẽ bằng 0.
+#### 2. Quy trình thiết lập và chạy dịch vụ API
+- Đồng bộ mã nguồn triển khai (Deployment code) lên EC2, cài đặt môi trường ảo Python (Virtual Environment) và các thư viện phụ thuộc (`boto3`, `torch`/`scikit-learn`, `uvicorn`).
+- Sử dụng thư viện `boto3` để viết mã tự động tải tệp `model.tar.gz` mới nhất từ S3 Bucket về máy chủ cục bộ ngay khi ứng dụng API khởi động.
+- Sử dụng một bộ quản lý tiến trình production (`systemd` hoặc `pm2`) kết hợp cùng `Nginx` làm Reverse Proxy để phân phối dịch vụ API dự đoán (Prediction Endpoint) ra bên ngoài.
 
 ---
 
-### Task 5: Tạo Cơ sở dữ liệu quan hệ được quản lý qua RDS (Nhận +$20 Credit)
+### Các Lệnh Tra Cứu Và Vận Hành Qua AWS CLI
 
-**Mục tiêu:** Thiết lập và quản lý một cụm cơ sở dữ liệu quan hệ (Relational Database) an toàn.
+Trong suốt quá trình thiết lập hạ tầng huấn luyện và triển khai API, các lệnh AWS CLI dưới đây được áp dụng thường xuyên nhằm kiểm tra trạng thái và xác thực tài nguyên:
 
-**Giới thiệu dịch vụ:** **Amazon RDS** tự động hóa các tác vụ quản trị cơ sở dữ liệu phức tạp như sao lưu dự phòng, vá lỗi phần mềm hệ thống và thiết lập cơ chế dự phòng chống sự cố.
+```bash
+# 1. Liệt kê các SageMaker notebook instance đang hoạt động kèm trạng thái
+aws sagemaker list-notebook-instances \
+  --query 'NotebookInstances[].{Name:NotebookInstanceName,Status:NotebookInstanceStatus,Type:InstanceType}' \
+  --output table
 
-**Quy trình thực hiện:**
-1. Vào **Amazon RDS Console** → chọn bài thực hành **Create an Amazon RDS Database**.
-2. Sử dụng chế độ **Easy create** để áp dụng cấu hình tối ưu dựng sẵn.
-3. Thiết lập thông số:
-   - Động cơ cơ sở dữ liệu (Database Engine): **Aurora (PostgreSQL Compatible)**.
-   - Loại máy chủ: Chọn kích thước tài nguyên nhỏ nhất có thể.
-4. Nhấn **Create database** và chờ trạng thái của cơ sở dữ liệu chuyển sang **Available**.
-5. **Quy trình dọn dẹp (Lưu ý thứ tự thực hiện):**
-   - Không thể xóa trực tiếp Cluster nếu còn instance hoạt động bên trong.
-   - Đầu tiên, chọn và thực hiện xóa DB instance (`database-1-instance-1`), bỏ chọn phần tạo snapshot cuối kỳ để hoàn thành nhanh.
-   - Sau khi instance được xóa xong, tiến hành xóa Cluster cha (`database-1`).
+# 2. Đồng bộ hóa thư mục dữ liệu đã xử lý từ local lên S3 bucket
+aws s3 sync ./processed-data/ s3://my-ml-model-bucket-2026/processed-data/
 
-> **Bài học kinh nghiệm:** Cơ sở dữ liệu quan hệ trên AWS có quy định nghiêm ngặt về chuỗi ràng buộc phụ thuộc. Cần xóa các instance con bên trong trước khi xóa cấu trúc cụm dữ liệu bên ngoài.
+# 3. Kiểm tra xem file artifact của mô hình đã được tải lên S3 thành công chưa
+aws s3 ls s3://my-ml-model-bucket-2026/model-artifacts/
 
----
+# 4. Xác thực trạng thái và IP công khai của máy chủ EC2 đang host API
+aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" \
+  --query 'Reservations[].Instances[].{ID:InstanceId,Type:InstanceType,IP:PublicIpAddress}' \
+  --output table
 
-### Tổng kết Ngày 1 & Bài học rút ra
-
-- **Tích lũy Credit:** Nhận thành công $100 credit ban đầu và kiếm thêm $100 qua việc hoàn tất 5 nhiệm vụ thực hành (Tổng cộng tài khoản có **$200**).
-- **Trải nghiệm thực tiễn:** Tiếp cận trực tiếp cách vận hành của các dịch vụ cốt lõi: từ máy ảo (EC2), dịch vụ AI (Bedrock), hệ thống cảnh báo (Budgets), kiến trúc serverless (Lambda) đến cơ sở dữ liệu (RDS).
-- **Ý thức tiết kiệm:** Rèn luyện thói quen kiểm tra và xóa bỏ tài nguyên ngay sau khi học xong. Việc quên tắt một DB instance hay máy chủ ảo có thể làm cạn kiệt lượng credit nhanh chóng.
-- **Tiếp cận chủ động:** Tận dụng các bài thực hành có sẵn trên AWS Console là cách tốt nhất và an toàn nhất để tìm hiểu cách hoạt động của một dịch vụ cloud mới.
+```
 
 ---
 
-*Nguồn tài liệu chính: [First Cloud Journey - AWS Study Group](https://cloudjourney.awsstudygroup.com/)*
+### Nội Dung Học Tập Đã Hoàn Thành
+
+| Ngày học | Nội dung bài học tập trung | Dịch vụ AWS liên quan |
+| --- | --- | --- |
+| **15/05/2026** | Xây dựng và Huấn luyện Mô hình Máy học | Amazon SageMaker, CloudWatch Logs |
+| **15/05/2026** | Lưu trữ Tập dữ liệu và Trọng số Mô hình | Amazon S3, S3 Bucket Policies |
+| **15/05/2026** | Triển khai và Phục vụ API Production | Amazon EC2, VPC Security Groups |
+
+---
+
+### Bài học rút ra từ Ngày 1
+
+1. **Kiến trúc phân tách (Decoupled Architecture):** Tách biệt rõ ràng tầng tính toán hiệu năng cao (SageMaker dùng để train, EC2 dùng làm API inference) khỏi tầng lưu trữ dữ liệu (S3) giúp hệ thống linh hoạt, dễ mở rộng và tối ưu hóa chi phí vận hành.
+2. **Quản trị phân quyền liền mạch:** Việc thiết lập chính xác các IAM Role giúp các dịch vụ tự động trao đổi dữ liệu an toàn với S3 mà hoàn toàn không cần phải hardcode (viết chết) các cặp Access Key/Secret Key bên trong mã nguồn ứng dụng.
+3. **Tính linh hoạt của Artifact:** Việc đóng gói toàn bộ mô hình thành file nén tập trung `model.tar.gz` trên S3 giúp đơn giản hóa quy trình CI/CD. Khi cần cập nhật phiên bản ứng dụng, máy chủ EC2 chỉ cần kéo tệp mới nhất từ S3 về mà không cần xây dựng lại toàn bộ hạ tầng máy chủ.
+
+---
+
+*Nguồn tài liệu chính: [First Cloud Journey - AWS Study Group*](https://cloudjourney.awsstudygroup.com/)

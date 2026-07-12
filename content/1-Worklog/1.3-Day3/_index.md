@@ -1,151 +1,105 @@
 ---
 title: "Day 3"
-date: 2026-05-04
+date: 2026-05-25
 weight: 3
 chapter: false
 pre: " <b> 1.3. </b> "
 ---
 
-> **Day 3 - Monday, May 4, 2026:** AWS CLI fundamentals, NoSQL with DynamoDB, CloudFront & Lambda@Edge, plus hands-on deployment of a web server on EC2 with a custom VPC.
+# Work Log: Provisioning RDS Postgres Database, Automating ETL Workflows with AWS Glue, and Scheduling Serverless Cron Jobs via EventBridge
+
+> **Day 3 - Monday, May 25, 2026:** Focused on building a structured data persistence layer using Amazon RDS PostgreSQL, designing an automated Extract, Transform, and Load (ETL) data pipeline via AWS Glue, and establishing time-based scheduling mechanisms using Amazon EventBridge.
 
 ---
 
 ### Objectives for the Day
 
-- Master the **AWS CLI** for programmatic resource management directly from the terminal.
-- Understand **NoSQL database** concepts with Amazon DynamoDB and when to choose it over relational databases.
-- Study **CDN** architecture with CloudFront and edge computing with Lambda@Edge.
-- Deploy a complete **web server** on EC2 within a custom VPC - including networking setup from scratch.
+- Provision and configure a secure, production-optimized **Amazon RDS PostgreSQL** relational database.
+- Build an automated **ETL (Extract, Transform, Load)** pipeline with **AWS Glue** to crawl, clean, and ingest raw S3 datasets into the database.
+- Automate pipeline execution schedules by designing serverless **Amazon EventBridge** rules.
+- Validate data integrity post-transformation and implement secure, cross-service IAM permissions.
 
 ---
 
-### Theory: AWS CLI (Command Line Interface)
+### Relational Database Management with Amazon RDS PostgreSQL
 
-**AWS CLI** is the unified command-line tool for interacting with all AWS services directly from a terminal - enabling automation, scripting, and programmatic management of cloud resources without touching the Console.
+#### 1. Database Provisioning and Network Isolation
+- Launched a stable **Amazon RDS PostgreSQL** instance, utilizing the `db.t3.micro` instance class within the AWS Free Tier boundaries for development testing.
+- Created a dedicated **DB Subnet Group** spanning exclusively across the VPC’s Private Subnets, ensuring the database tier remains completely isolated from the public internet.
+- Enabled **Auto Minor Version Upgrade** to let AWS automatically handle minor security patches for the PostgreSQL engine.
 
-**Key concepts learned:**
-- Install and configure AWS CLI using `aws configure` (Access Key ID, Secret Access Key, default Region, Output format).
-- Run common commands: `aws ec2 describe-instances`, `aws s3 ls`, `aws iam list-users`.
-- Use the `--query` flag (JMESPath syntax) and `--output` flag (json, table, text) to filter and format results.
-- Create **named profiles** to manage multiple AWS accounts: `aws configure --profile my-profile`.
-- Use `--dry-run` flag to validate permissions without actually executing a command.
+#### 2. Advanced Security Hardening
+- Structured the **RDS Security Group** to strictly accept inbound traffic on the standard PostgreSQL port `5432` only when originating from the EC2 application fleet Security Group (from Day 2) or the AWS Glue network environment.
+- Activated **Storage Encryption** at rest utilizing the default AWS Key Management Service (KMS) master key.
+
+---
+
+### Data Transformation Pipelines with AWS Glue
+
+#### 1. Schema Discovery via Glue Crawler & Data Catalog
+- Configured an **AWS Glue Crawler** targeted at the `/raw-data/` prefix within the designated Amazon S3 Bucket (created on Day 1).
+- Executed the crawler to automatically analyze raw file structures (JSON/CSV) and map the extracted metadata schema into a logical table inside the central **AWS Glue Data Catalog**.
+
+#### 2. Glue ETL Job Engineering (Python/Spark)
+- Developed an isolated **AWS Glue ETL Job** using a Python/PySpark runtime environment to perform crucial data refining steps:
+  - Dropped duplicate records and handled missing/null values systematically.
+  - Normalized date-time formatting and cast machine learning feature columns into appropriate data types.
+- Configured a JDBC (Java Database Connectivity) output block within the Glue Job to securely write the transformed, clean datasets directly into the target tables inside **RDS PostgreSQL**.
+
+---
+
+### Serverless Workflow Automation via Amazon EventBridge
+
+#### 1. EventBridge Rule Configuration (Cron Scheduling)
+- Transformed the manual ETL tasks into a fully automated pipeline by designing an **Amazon EventBridge Rule** running on a time-based schedule.
+- Implemented a standard **Cron Expression** (`cron(0 1 * * ? *)`) to trigger the end-to-end data pipeline daily at 01:00 AM, taking advantage of low-peak operational hours.
+
+#### 2. Target Mapping & Failure Handling
+- Routed the EventBridge rule target directly to activate the newly created AWS Glue ETL Job.
+- Configured an automated **Retry Policy** (up to 3 attempts) along with a Dead-Letter Queue (DLQ) mapped to an Amazon SQS queue to isolate failed invocation events for administrative debugging.
+
+---
+
+### Operational CLI & Diagnostic Commands
+
+The following AWS CLI commands were utilized to audit the relational database deployment, trigger data crawlers, and monitor automated schedules:
 
 ```bash
-# Example: List all S3 buckets
-aws s3 ls
+# 1. Verify the operational status and connection endpoint of the RDS PostgreSQL instance
+aws rds describe-db-instances \
+  --db-instance-identifier my-postgres-db \
+  --query 'DBInstances[].{Status:DBInstanceStatus,Endpoint:Endpoint.Address,Port:Endpoint.Port}'
 
-# Example: Describe running EC2 instances in a specific region
-aws ec2 describe-instances \
-  --region ap-southeast-1 \
-  --filters "Name=instance-state-name,Values=running" \
-  --query 'Reservations[].Instances[].{ID:InstanceId,Type:InstanceType}'
+# 2. Trigger an asynchronous AWS Glue Crawler execution to scan new files on S3
+aws glue start-crawler --name my-s3-raw-data-crawler
+
+# 3. Manually kick off the AWS Glue ETL Job and generate a runtime execution ID
+aws glue start-job-run --job-name my-data-transform-job
+
+# 4. Inspect the operational state and expression string of the EventBridge schedule rule
+aws events describe-rule --name daily-etl-schedule-rule \
+  --query '{Name:Name,State:State,Schedule:ScheduleExpression}'
+
 ```
 
-> **Lesson:** AWS CLI is an indispensable tool for DevOps engineers - every resource manageable in the Console can be automated via CLI. Mastering it is the first step toward building deployment pipelines.
+---
+
+### Completed Core Topics & Schedule
+
+| Study Date | Core Topic Focus | Primary AWS Services Involved |
+| --- | --- | --- |
+| **25/05/2026** | Secure Relational Database Management & Isolation | Amazon RDS PostgreSQL, AWS KMS |
+| **25/05/2026** | Metadata Discovery & Serverless ETL Orchestration | AWS Glue (Crawler, Data Catalog, Job) |
+| **25/05/2026** | Serverless Cron Scheduling & Target Routing | Amazon EventBridge |
 
 ---
 
-### Theory: NoSQL with Amazon DynamoDB
+### Day 3 Key Takeaways
 
-**Amazon DynamoDB** is a serverless, fully managed NoSQL database delivering single-digit millisecond performance at any scale - no capacity planning, no maintenance windows.
-
-**Core concepts:**
-- **Data model:** Tables, Items (rows), Attributes (columns) - no fixed schema required.
-- **Primary Keys:**
-  - *Partition Key only* (simple): e.g., `UserId`
-  - *Partition Key + Sort Key* (composite): e.g., `UserId` + `OrderDate` for time-series data
-- **Read/Write capacity modes:**
-  - *Provisioned*: Fixed capacity, predictable workloads, cheaper at consistent scale
-  - *On-Demand*: Auto-scales instantly, pay per request - ideal for unpredictable traffic
-- **DynamoDB Streams:** Capture item-level changes in order - power event-driven architectures (e.g., trigger Lambda on every data change).
-- **Global Tables:** Multi-region, multi-master replication for sub-10ms latency anywhere in the world.
-- **DAX (DynamoDB Accelerator):** In-memory cache that reduces read latency from milliseconds to **microseconds**.
-
-> **Lesson:** Choose DynamoDB when you need horizontal scalability, flexible schema, and consistent millisecond latency - perfect for leaderboards, session stores, IoT telemetry, and shopping carts. Choose RDS when you need complex joins, ACID transactions, and strict schema.
+1. **Database Network Isolation Principle:** Relational databases should never be exposed directly to the public internet (`Publicly Accessible = No`). Restricting access strictly to internal Security Groups belonging to the EC2 application layer or the Glue ETL environment effectively minimizes the network attack surface.
+2. **The Power of Centralized Metadata:** The AWS Glue Data Catalog serves as an essential central data dictionary. It allows indexing of vast data structures sitting on S3 without moving the actual data files, keeping subsequent analytical and ML workloads structured and highly organized.
+3. **Transitioning to Serverless Event-Driven Architectures:** Replacing traditional, server-bound crontab setups with Amazon EventBridge eliminates the overhead costs of maintaining 24/7 idle host instances. The entire orchestration and compute layer (EventBridge + Glue) incurs costs exclusively during the exact seconds of code execution, drastically optimizing operational expenditures (OpEx).
 
 ---
 
-### Theory: CloudFront & Lambda@Edge
-
-**Amazon CloudFront** is AWS's global **CDN (Content Delivery Network)** - caches and serves content from **Edge Locations** closest to the end user, dramatically reducing latency for static assets, APIs, and streaming media.
-
-**Lambda@Edge** extends AWS Lambda to run at CloudFront edge locations - allowing request/response customization without routing traffic back to the origin server.
-
-**Key concepts:**
-- **Distributions:** CloudFront delivery configurations pointing to **origins** (S3, ALB, EC2, custom HTTP endpoints).
-- **Behaviors:** Rules mapping URL patterns to specific origin and cache configurations.
-- **Cache policies & Origin request policies:** Fine-grained control over what gets cached and what's forwarded to the origin.
-- **HTTPS enforcement:** Force all traffic to HTTPS via custom SSL certificates through AWS Certificate Manager (ACM).
-- **Lambda@Edge triggers:**
-  - *Viewer Request*: Modify the request before CloudFront checks cache
-  - *Origin Request*: Modify what's forwarded to origin (cache miss)
-  - *Origin Response*: Modify the response from origin before it's cached
-  - *Viewer Response*: Modify the final response sent to the client
-- **Use cases:** URL rewrites, A/B testing at the edge, JWT authentication without a backend, image optimization.
-
----
-
-### Hands-On: Deploy a Web Server on EC2 with Custom VPC
-
-#### Step 1: Create VPC and Networking
-
-| Resource | Configuration |
-|----------|--------------|
-| VPC | CIDR: `10.0.0.0/16` |
-| Public Subnet | CIDR: `10.0.1.0/24`, AZ: `ap-southeast-1a` |
-| Internet Gateway | Attached to VPC |
-| Route Table | Route `0.0.0.0/0` → Internet Gateway |
-
-Creating a custom VPC from scratch rather than using the default VPC builds a deeper understanding of how AWS networking actually works.
-
-#### Step 2: Launch EC2 Instance as Web Server
-
-1. Go to **EC2 Console** → **Launch Instance**.
-2. Select **Amazon Linux 2023 AMI** (free tier eligible).
-3. Instance type: `t2.micro`.
-4. Place instance in the custom VPC and public subnet.
-5. Configure **Security Group**: Allow inbound `HTTP (port 80)` and `SSH (port 22)`.
-6. Add **User Data script** to automatically install and start Apache on boot:
-   ```bash
-   #!/bin/bash
-   yum update -y
-   yum install -y httpd
-   systemctl start httpd
-   systemctl enable httpd
-   echo "<h1>Hello from AWS EC2 - Day 3!</h1>" > /var/www/html/index.html
-   ```
-7. Launch the instance and access the public IP to verify the web server is working.
-
-#### Step 3: Clean Up After Practice
-
-```bash
-# Terminate EC2 instance
-aws ec2 terminate-instances --instance-ids <instance-id>
-
-# Detach and delete Internet Gateway
-aws ec2 detach-internet-gateway --internet-gateway-id <igw-id> --vpc-id <vpc-id>
-aws ec2 delete-internet-gateway --internet-gateway-id <igw-id>
-
-# Delete Subnet, Route Table, then VPC (in that order)
-aws ec2 delete-subnet --subnet-id <subnet-id>
-aws ec2 delete-route-table --route-table-id <rt-id>
-aws ec2 delete-vpc --vpc-id <vpc-id>
-```
-
-> ⚠️ Always clean up all resources after practice to avoid unexpected charges.
-
-> **Lesson:** Understanding VPC networking - subnets, route tables, and Internet Gateways - is foundational to deploying any internet-accessible resource on AWS. Almost every production architecture starts with a well-designed VPC.
-
----
-
-### Key Takeaways
-
-- **AWS CLI** transforms manual Console operations into repeatable, scriptable commands - essential for automation.
-- **DynamoDB vs. RDS** is not a matter of better/worse - it's about matching the database model to the access patterns.
-- **CloudFront + Lambda@Edge** enables powerful edge computing: security, personalization, and performance optimization without any round-trips to the origin.
-- Building a VPC from scratch (not using the default) reveals the true mechanics of AWS networking - subnets, routing tables, and internet gateway dependencies.
-- The **User Data script** pattern is powerful - it enables fully automated server configuration at launch time without any manual SSH login.
-
----
-
-*Source: [First Cloud Journey - AWS Study Group](https://cloudjourney.awsstudygroup.com/)*
+*Source: [First Cloud Journey - AWS Study Group*](https://cloudjourney.awsstudygroup.com/)

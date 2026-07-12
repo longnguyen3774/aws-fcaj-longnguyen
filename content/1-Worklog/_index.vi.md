@@ -1,17 +1,19 @@
 ---
-title: "Nhật ký công việc"
-date: 2024-06-08
+title: "Nhật ký làm việc"
+date: 2026-06-08
 weight: 1
 chapter: false
 pre: " <b> 1. </b> "
 ---
 
-Đây là nhật ký công việc của mình trong suốt chương trình thực tập **First Cloud AI Journey** - chương trình thực tập về Cloud và AI trên nền tảng AWS. Mỗi entry ghi lại mục tiêu học tập trong ngày, các dịch vụ được khám phá, các task thực hành đã hoàn thành và bài học rút ra.
+Đây là nhật ký làm việc (worklog) của tôi trong suốt chương trình thực tập **First Cloud AI Journey** - một chương trình tập trung chuyên sâu vào Cloud và AI trên nền tảng AWS. Mỗi bài viết ghi lại chi tiết các mục tiêu học tập trong ngày, các dịch vụ đã nghiên cứu, các tác vụ thực hành đã hoàn thành cùng với những bài học kinh nghiệm quý giá rút ra.
 
-Chương trình kéo dài khoảng **3 tháng** (20/04 – 15/07/2026), bao gồm các nội dung từ cơ bản đến nâng cao về điện toán đám mây, AI/ML, data engineering, bảo mật và kiến trúc hệ thống trên AWS.
+Chương trình kéo dài khoảng **3 tháng** (từ ngày 20/04 đến ngày 15/07/2026), bao gồm các chủ đề từ nền tảng đến nâng cao về điện toán đám mây, AI/ML, kỹ thuật dữ liệu, bảo mật và kiến trúc hệ thống trên AWS.
 
 ---
 
-**Ngày 1**: [Thiết lập tài khoản, AWS Credits & 5 Tasks thực hành (EC2, Bedrock, Budgets, Lambda, RDS)](1.1-Day1/)
+**Ngày 1 - 15/05/2026**: [Xây Dựng & Huấn Luyện Mô Hình Với SageMaker, Lưu Trữ Dữ Liệu Trên S3 Và Triển Khai API Trên EC2](1.1-Day1/)
 
-**Ngày 2**: [Giám sát chi phí đa lớp, Advanced Analytics & Lý thuyết nền tảng AWS](1.2-Day2/)
+**Ngày 2 - 22/05/2026**: [Tối Ưu Phân Phối Tốc Độ Cao Với CloudFront, Điều Hướng Lưu Lượng Bằng ALB Và Tự Động Mở Rộng Hệ Thống Với Auto Scaling](1.2-Day2/)
+
+**Ngày 3 - 25/05/2026**: [Khởi Tạo Cơ Sở Dữ Liệu RDS Postgres, Tự Động Hóa Biến Đổi Dữ Liệu Với AWS Glue Và Lập Lịch Cron Job Bằng EventBridge](1.3-Day3/)

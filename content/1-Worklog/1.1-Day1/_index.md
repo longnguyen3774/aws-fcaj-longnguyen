@@ -1,140 +1,106 @@
 ---
 title: "Day 1"
-date: 2026-06-01
+date: 2026-05-15
 weight: 1
 chapter: false
 pre: " <b> 1.1. </b> "
 ---
 
-# Work Log: Account Setup, AWS Credits, and Core Guided Labs
+# Work Log: Model Development with SageMaker, S3 Storage, and EC2 API Deployment
 
-> **Day 1 - Monday, June 01, 2026:** Activated the AWS student account, requested initial credits, and successfully completed 5 foundational console tasks to secure additional promotional credits.
+> **Day 1 - Friday, May 15, 2026:** Focused on building and training machine learning models using Amazon SageMaker, managing datasets and artifacts via Amazon S3, and deploying the trained model as a production-ready API on Amazon EC2.
 
 ---
 
 ### Objectives for the Day
 
-- Register and configure a new AWS account, obtaining **$100 in initial credits** from the program.
-- Complete **5 practical tasks** on the AWS Console to earn an extra **$100 credit** ($20 per task).
-- gain initial familiarity with 5 foundational AWS services: EC2, Bedrock, Budgets, Lambda, and RDS.
-- Understand the basics of AWS billing controls, security configurations, and resource cleanup.
+- Configure an **Amazon SageMaker** notebook instance to build, train, and evaluate a machine learning model.
+- Leverage **Amazon S3** as a secure, high-durability storage solution for raw datasets and trained model artifacts.
+- Deploy the finalized model as a scalable **API endpoint on Amazon EC2** using a Python web framework (e.g., FastAPI/Flask).
+- Establish resource access controls and networking to ensure seamless integration between SageMaker, S3, and EC2.
 
 ---
 
-### Task 1: Launch an EC2 Virtual Machine (+$20 Credit)
+### Machine Learning Workflows with Amazon SageMaker
 
-**Objective:** Provision and manage a Linux-based Virtual Machine in the cloud.
+#### 1. Environment & Notebook Setup
+- Provisioned a SageMaker Notebook Instance (`ml.t3.medium`) to serve as the centralized development environment.
+- Configured IAM Execution Roles with specific permissions (`AmazonSageMakerFullAccess`) allowing SageMaker to read training data from and write model artifacts to Amazon S3.
 
-**Service Overview:** **Amazon EC2 (Elastic Compute Cloud)** provides resizable virtual computing capacity, enabling users to launch virtual servers with customized operating systems and networking.
-
-**Steps Executed:**
-1. Navigate to the **AWS Console** → locate the **Explore AWS** home page widget → select the **Launch an instance using EC2** task.
-2. Select **Start activity** to initiate the guided lab.
-3. Configure the VM:
-   - Name tag: `FCA-Test-Server`
-   - OS Image (AMI): Standard Amazon Linux 2023 (Free Tier eligible).
-   - Instance Type: Keep default micro configuration (`t3.micro` or `t2.micro`).
-4. Generate a new cryptographic Key Pair for secure access:
-   - Key pair name: `fca-keypair`
-   - Key pair type: **RSA**
-   - Private key file format: **.pem** (saved locally).
-5. Establish a Security Group with default rules allowing essential traffic.
-6. Verify configurations and select **Launch Instance**.
-7. **Verification Step:** Check the instance dashboard to confirm the instance status transitions to **Running** and passes the **2/2 status checks**.
-8. **Teardown (Crucial):** Select the instance → Instance State → **Terminate Instance** to stop resource consumption.
-
-> **Key Lesson:** Launching resources on AWS takes only a few clicks, but they incur ongoing charges. Terminating the EC2 instance immediately after testing is vital to prevent credit drain. Always check that the associated EBS volume is also deleted.
+#### 2. Model Building & Training Pipeline
+- Developed a data preprocessing script to clean and format features before training.
+- Utilized built-in algorithms/custom Docker containers within SageMaker to execute the training job.
+- Monitored training metrics (loss, accuracy) directly through SageMaker Logs integrated with Amazon CloudWatch.
+- Outputted the serialized model file (`model.tar.gz`) directly to a designated S3 bucket upon successful completion.
 
 ---
 
-### Task 2: Prompting in Amazon Bedrock Playground (+$20 Credit)
+### Data & Artifact Lifecycle Management with Amazon S3
 
-**Objective:** Explore generative AI capabilities using foundational language models on AWS.
+#### 1. Bucket Structure & Storage Tiers
+To support the machine learning lifecycle, I structured an S3 bucket with organized prefixes for clear data separation:
 
-**Service Overview:** **Amazon Bedrock** is a fully managed service that offers access to high-performing foundation models from leading AI companies (such as Anthropic, Meta, Cohere) via a single API, without managing server infrastructure.
+| Folder / Prefix | Data Type | Storage Class | Description |
+|---|---|---|---|
+| `/raw-data/` | Original Datasets | S3 Standard | Low latency for frequent read access during data exploration. |
+| `/processed-data/` | Preprocessed Features | S3 Standard | Cleaned data ready to be ingested by training jobs. |
+| `/model-artifacts/` | `model.tar.gz` files | S3 Standard | Output directories containing trained model weights. |
 
-**Steps Executed:**
-1. Open the **Amazon Bedrock Console** → choose the task **Use a foundation model in Amazon Bedrock**.
-2. Request model access for **Claude 3 Haiku** (a fast, cost-efficient model for general text tasks).
-3. If an access authorization error occurs, submit a brief justification under **Model access** to request permission.
-4. Once access is active, navigate to the **Text Playground** and select **Claude 3 Haiku**.
-5. Input a prompt (e.g., "Summarize the benefits of cloud computing in three bullet points") and click **Run**.
-6. Review the output, adjust parameters like Temperature (to control creativity), and click **Finish** to complete the task.
-
-> **Key Lesson:** Access to advanced AI models is governed by AWS's Responsible AI policies. Submitting a clear, professional use case description accelerates the allowlisting process.
-
----
-
-### Task 3: Configure Cost Alerting in AWS Budgets (+$20 Credit)
-
-**Objective:** Set up proactive alerts to monitor credit usage and prevent billing surprises.
-
-**Service Overview:** **AWS Budgets** tracks resource spending and sends alerts via email or SNS when costs approach or exceed defined thresholds.
-
-**Steps Executed:**
-1. Access the **AWS Billing Console** → select **Budgets** → start the task **Set up a cost budget using AWS Budgets**.
-2. Click **Start activity** to launch the creation wizard.
-3. Configure budget settings:
-   - Budget Type: Cost Budget.
-   - Period: Monthly.
-   - Budgeted Amount: $20.00.
-4. Define alert thresholds:
-   - Set an alert when actual costs reach **80% ($16.00)** of the budget.
-   - Enter a personal email address to receive notifications.
-5. Review configurations and click **Create budget**.
-
-> **Key Lesson:** Setting up a budget is the first line of defense in any cloud project. Proactive notifications ensure that runaway resources are identified before they consume all available credits.
+#### 2. Durability & Security Controls
+- Verified **99.999999999% (11 nines)** data durability guarantees provided by S3 to ensure critical model artifacts are never lost.
+- Applied explicit **S3 Bucket Policies** restricting access solely to the SageMaker training role and the EC2 production instance.
 
 ---
 
-### Task 4: Deploy a Serverless Web Application with AWS Lambda (+$20 Credit)
+### Model API Deployment on Amazon EC2
 
-**Objective:** Run backend code using a serverless architecture.
+#### 1. EC2 Instance Provisioning
+- Launched an Amazon EC2 instance (`t3.medium` or compute-optimized `c6i.large` depending on model size) running Amazon Linux 2023.
+- Configured a **Security Group** allowing inbound traffic on standard web ports (`80`, `443`) and the custom API port (`8000`).
 
-**Service Overview:** **AWS Lambda** executes code in response to events (like HTTP requests) and automatically manages the underlying compute resource scaling. Charges are based solely on execution time, meaning zero costs when inactive.
-
-**Steps Executed:**
-1. Navigate to the **AWS Lambda Console** → select the task **Create a web app using AWS Lambda**.
-2. Click **Start activity** → select **Use a blueprint** → search for the template **Getting started with Lambda HTTP**.
-3. Configure the function:
-   - Function name: `fca-http-lambda-app`
-   - Select the acknowledgment box for creating an IAM role with basic permissions.
-4. Click **Create function** and wait for deployment.
-5. **Testing Step:** Copy the generated **Function URL** from the dashboard, paste it into a browser tab, and verify that it returns a successful JSON greeting.
-6. **Teardown:** Delete the function to clean up the workspace.
-
-> **Key Lesson:** Serverless computing eliminates the overhead of server patching and scaling. It scales down to zero, ensuring that a deployed function that receives no traffic costs nothing.
+#### 2. API Implementation & Deployment Steps
+- Cloned the deployment repository onto the EC2 instance containing a lightweight API framework (FastAPI/Flask).
+- Configured a Python virtual environment and installed necessary dependencies (`boto3`, `torch`/`scikit-learn`, `uvicorn`).
+- Wrote a script using `boto3` to pull the latest `model.tar.gz` file down from the Amazon S3 bucket during application startup.
+- Set up a production-ready process manager (`systemd` or `pm2`) along with `Nginx` as a reverse proxy to host the prediction API endpoint.
 
 ---
 
-### Task 5: Launch a Managed Relational Database using RDS (+$20 Credit)
+### CLI Operations & Diagnostic Commands
 
-**Objective:** Deploy a secure, managed relational database cluster.
+When managing the infrastructure for training and deployment, these AWS CLI commands are used to check resource state and verify logs:
 
-**Service Overview:** **Amazon RDS (Relational Database Service)** automates complex database administration tasks, including database provisioning, patching, backups, and scaling.
+```bash
+# 1. List active SageMaker notebook instances and their statuses
+aws sagemaker list-notebook-instances   --query 'NotebookInstances[].{Name:NotebookInstanceName,Status:NotebookInstanceStatus,Type:InstanceType}'   --output table
 
-**Steps Executed:**
-1. Open the **Amazon RDS Console** → choose the task **Create an Amazon RDS Database**.
-2. Select **Easy create** to use optimized defaults.
-3. Configuration parameters:
-   - Database Engine: **Aurora (PostgreSQL Compatible)**.
-   - DB Instance Class: Select the smallest available instance type.
-4. Click **Create database** and monitor the database status until it shifts to **Available**.
-5. **Teardown Step (Order Matters):**
-   - Attempting to delete the cluster directly will fail due to dependency constraints.
-   - First, select and delete the DB instance (`database-1-instance-1`), choosing to skip the final snapshot.
-   - Second, select and delete the parent DB cluster (`database-1`).
+# 2. Sync processed local data up to the S3 bucket
+aws s3 sync ./processed-data/ s3://my-ml-model-bucket-2026/processed-data/
 
-> **Key Lesson:** Managed database clusters have strict dependency chains. You must always remove the reader and writer instances before the cluster metadata can be deleted.
+# 3. Check if the model artifact has been successfully uploaded to S3
+aws s3 ls s3://my-ml-model-bucket-2026/model-artifacts/
+
+# 4. Verify running EC2 instances hosting the production API
+aws ec2 describe-instances --filters "Name=instance-state-name,Values=running"   --query 'Reservations[].Instances[].{ID:InstanceId,Type:InstanceType,IP:PublicIpAddress}'   --output table
+```
 
 ---
 
-### Day 1 Summary & Key Takeaways
+### Study Schedule & Topics Completed
 
-- **Credits Secured:** Successfully claimed $100 in startup credits and earned an additional $100 by completing the 5 guided tasks (Total: **$200**).
-- **Service Familiarity:** Gained hands-on experience deploying instances (EC2), configuring AI prompts (Bedrock), monitoring budgets (AWS Budgets), executing serverless functions (Lambda), and managing databases (RDS).
-- **Cost Discipline:** Developed a strong habit of terminating resources immediately after deployment. A single database instance or VM left active can deplete credits rapidly.
-- **Guided Exploration:** Using the AWS Console's guided tasks is a low-risk, structured method for testing new cloud services.
+| Study Date | Core Topic Focus | Primary AWS Services Involved |
+|---|---|---|
+| **15/05/2026** | Model Development & Training | Amazon SageMaker, CloudWatch Logs |
+| **15/05/2026** | Dataset & Model Weights Storage | Amazon S3, S3 Bucket Policies |
+| **15/05/2026** | Production API Hosting & Deployment | Amazon EC2, VPC Security Groups |
+
+---
+
+### Day 1 Key Takeaways
+
+1. **Decoupled Architecture:** Separating the compute layers (SageMaker for heavy training, EC2 for real-time inference) from the storage layer (S3) optimizes cost and performance.
+2. **Seamless Permissions:** Properly configured IAM roles allow SageMaker and EC2 to securely communicate with S3 without hardcoding access keys inside application scripts.
+3. **Artifact Portability:** Compiling model weights into a centralized `model.tar.gz` on S3 simplifies CI/CD workflows, allowing new production APIs on EC2 to effortlessly fetch updated models.
 
 ---
 

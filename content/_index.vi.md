@@ -7,29 +7,6 @@ chapter: false
 
 # Báo cáo thực tập
 ### Thông tin sinh viên 1:
-&emsp; **Họ và tên:** Trần Trọng Thành
-
-&emsp; **Số điện thoại:** 0966777941
-
-&emsp; **Email:** trongthanh1152004@gmail.com
-
-&emsp; **Trường:** Đại học Công Nghệ TP.HCM
-
-&emsp; **Ngành:** Khoa học dữ liệu
-
-&emsp; **Lớp:** 22DKHA1
-
-&emsp; **Công ty thực tập:** Công ty TNHH Amazon Web Services Vietnam
-
-&emsp; **Vị trí thực tập:** FCJ Data Engineer Intern
-
-&emsp; **Thời gian thực tập:** Từ ngày 20/04/2026 đến ngày 15/07/2026
-
-![Ảnh đại diện của bạn](/images/avatar1.png)
-
----
-
-### Thông tin sinh viên 2:
 &emsp; **Họ và tên:** Nguyễn Phi Long
 
 &emsp; **Số điện thoại:** 0786990980
@@ -48,7 +25,30 @@ chapter: false
 
 &emsp; **Thời gian thực tập:** Từ ngày 20/04/2026 đến ngày 15/07/2026
 
-![Ảnh đại diện sinh viên 2](/images/avatar2.jpg)
+![Ảnh đại diện sinh viên 1](/images/avatar1.jpg)
+
+---
+
+### Thông tin sinh viên 2:
+&emsp; **Họ và tên:** Trần Trọng Thành
+
+&emsp; **Số điện thoại:** 0966777941
+
+&emsp; **Email:** trongthanh1152004@gmail.com
+
+&emsp; **Trường:** Đại học Công Nghệ TP.HCM
+
+&emsp; **Ngành:** Khoa học dữ liệu
+
+&emsp; **Lớp:** 22DKHA1
+
+&emsp; **Công ty thực tập:** Công ty TNHH Amazon Web Services Vietnam
+
+&emsp; **Vị trí thực tập:** FCJ Data Engineer Intern
+
+&emsp; **Thời gian thực tập:** Từ ngày 20/04/2026 đến ngày 15/07/2026
+
+![Ảnh đại diện của sinh viên 2](/images/avatar2.png)
 
 ---
 

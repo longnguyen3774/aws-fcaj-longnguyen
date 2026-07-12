@@ -1,151 +1,105 @@
 ---
 title: "Ngày 3"
-date: 2026-05-04
+date: 2026-05-25
 weight: 3
 chapter: false
 pre: " <b> 1.3. </b> "
 ---
 
-> **Ngày 3 - Thứ 2, 04/05/2026:** Nền tảng AWS CLI, NoSQL với DynamoDB, CloudFront & Lambda@Edge, và thực hành triển khai web server trên EC2 với VPC tùy chỉnh.
+# Nhật Ký Làm Việc: Khởi Tạo Cơ Sở Dữ Liệu RDS Postgres, Tự Động Hóa Biến Đổi Dữ Liệu Với AWS Glue Và Lập Lịch Cron Job Bằng EventBridge
+
+> **Ngày 3 - Thứ Hai, ngày 25/05/2026:** Tập trung xây dựng lớp lưu trữ dữ liệu có cấu trúc bằng Amazon RDS Postgres, thiết kế đường ống trích xuất và biến đổi dữ liệu (ETL) tự động thông qua AWS Glue, và thiết lập cơ chế kích hoạt theo lịch trình thời gian sử dụng Amazon EventBridge.
 
 ---
 
-### Mục tiêu trong ngày
+### Mục tiêu học tập trong ngày
 
-- Thành thạo **AWS CLI** để quản lý tài nguyên cloud bằng lập trình trực tiếp từ terminal.
-- Hiểu các khái niệm **cơ sở dữ liệu NoSQL** với Amazon DynamoDB và khi nào nên chọn nó thay vì CSDL quan hệ.
-- Học kiến trúc **CDN** với CloudFront và điện toán biên với Lambda@Edge.
-- Triển khai một **web server** hoàn chỉnh trên EC2 trong VPC tùy chỉnh - bao gồm thiết lập networking từ đầu.
+- Khởi tạo và cấu hình một cơ sở dữ liệu quan hệ **Amazon RDS PostgreSQL** bảo mật và tối ưu cho ứng dụng.
+- Xây dựng quy trình **ETL (Extract, Transform, Load)** với **AWS Glue** để tự động thu thập và biến đổi dữ liệu thô từ S3 trước khi nạp vào database.
+- Tự động hóa lịch trình thực thi toàn bộ hệ thống bằng các quy tắc **Amazon EventBridge (thay thế CloudWatch Events)**.
+- Kiểm tra tính toàn vẹn của dữ liệu sau biến đổi và phân quyền IAM an toàn giữa các dịch vụ.
 
 ---
 
-### Lý thuyết: AWS CLI (Command Line Interface)
+### Quản Trị Cơ Sở Dữ Liệu Với Amazon RDS PostgreSQL
 
-**AWS CLI** là công cụ dòng lệnh thống nhất để tương tác với tất cả dịch vụ AWS trực tiếp từ terminal - cho phép tự động hóa, scripting và quản lý lập trình các tài nguyên cloud mà không cần vào Console.
+#### 1. Khởi tạo và Phân nhóm mạng (Subnet Group)
+- Khởi chạy một database instance **Amazon RDS PostgreSQL** bản stable, cấu hình lớp lưu trữ `db.t3.micro` thuộc diện Free Tier để thử nghiệm.
+- Tạo một **DB Subnet Group** chuyên biệt gom nhóm các Private Subnet trong VPC, đảm bảo cơ sở dữ liệu hoàn toàn cô lập khỏi Internet.
+- Thiết lập cơ chế **Auto Minor Version Upgrade** để hệ thống tự động vá các lỗi bảo mật nhỏ của PostgreSQL.
 
-**Các nội dung đã học:**
-- Cài đặt và cấu hình AWS CLI bằng `aws configure` (Access Key ID, Secret Access Key, Region mặc định, Output format).
-- Chạy các lệnh phổ biến: `aws ec2 describe-instances`, `aws s3 ls`, `aws iam list-users`.
-- Dùng flag `--query` (cú pháp JMESPath) và `--output` (json, table, text) để lọc và định dạng kết quả.
-- Tạo **named profiles** để quản lý đa tài khoản: `aws configure --profile my-profile`.
-- Dùng flag `--dry-run` để kiểm tra quyền mà không thực sự thực thi lệnh.
+#### 2. Cấu hình bảo mật nâng cao
+- Thiết lập **Security Group cho RDS**: Chỉ cho phép các kết nối inbound ở cổng tiêu chuẩn `5432` đi đến từ Security Group của nhóm máy chủ EC2 (từ Ngày 2) và môi trường AWS Glue.
+- Kích hoạt tính năng **Storage Encryption** (Mã hóa dữ liệu khi lưu trữ) sử dụng khóa KMS mặc định của AWS.
+
+---
+
+### Trích Xuất Và Biến Đổi Dữ Liệu Tự Động Với AWS Glue
+
+#### 1. Khám phá dữ liệu với Glue Crawler & Data Catalog
+- Khởi tạo một **AWS Glue Crawler** để tự động quét qua thư mục dữ liệu thô `/raw-data/` trên S3 Bucket (từ Ngày 1).
+- Crawler tự động phân tích cấu trúc tệp dữ liệu (JSON/CSV) và ánh xạ schema vào một bảng dữ liệu logic nằm trong **AWS Glue Data Catalog**.
+
+#### 2. Thiết kế Glue ETL Job (Python/Spark)
+- Xây dựng một **Glue ETL Job** (sử dụng mã nguồn Python/PySpark) thực hiện các tác vụ xử lý dữ liệu nâng cao:
+  - Loại bỏ các bản ghi trùng lặp (Drop Duplicates) và xử lý các giá trị bị khuyết (Null values).
+  - Chuẩn hóa định dạng ngày tháng và chuyển đổi kiểu dữ liệu của các đặc trưng (Features) để phù hợp với mô hình ML.
+- Đầu ra của Glue Job cấu hình kết nối JDBC (Java Database Connectivity) để ghi trực tiếp các bản ghi đã làm sạch vào các bảng (Tables) bên trong cơ sở dữ liệu **RDS Postgres**.
+
+---
+
+### Tự Động Hóa Lịch Trình Thực Thi Bằng Amazon EventBridge
+
+#### 1. Cấu hình EventBridge Rule (Schedule)
+- Thay vì chạy các tác vụ ETL thủ công, tôi thiết lập một **EventBridge Rule** hoạt động theo dạng **Schedule** (Lịch trình) để biến hệ thống thành một đường ống dữ liệu tự động hoàn toàn.
+- Sử dụng biểu thức **Cron Expression** (`cron(0 1 * * ? *)`) để lên lịch kích hoạt hệ thống đều đặn vào lúc 01:00 AM mỗi ngày khi lượng tải hệ thống thấp.
+
+#### 2. Điều phối mục tiêu (Target Mapping)
+- Cấu hình Target của EventBridge Rule trỏ trực tiếp đến AWS Glue Job vừa khởi tạo ở bước trước.
+- Thiết lập **Retry Policy** (Chính sách thử lại) tối đa 3 lần và cấu hình Dead-Letter Queue (DLQ) qua SQS để lưu giữ các sự kiện bị lỗi nếu Glue Job không thể kích hoạt thành công.
+
+---
+
+### Các Lệnh Vận Hành Và Giám Sát Qua AWS CLI
+
+Dưới đây là các lệnh CLI hỗ trợ việc kiểm tra trạng thái của cơ sở dữ liệu, kích hoạt đường ống dữ liệu và giám sát lịch trình:
 
 ```bash
-# Ví dụ: Liệt kê tất cả S3 buckets
-aws s3 ls
+# 1. Kiểm tra trạng thái hoạt động và Endpoint kết nối của cơ sở dữ liệu RDS Postgres
+aws rds describe-db-instances \
+  --db-instance-identifier my-postgres-db \
+  --query 'DBInstances[].{Status:DBInstanceStatus,Endpoint:Endpoint.Address,Port:Endpoint.Port}'
 
-# Ví dụ: Mô tả các EC2 instances đang chạy trong region cụ thể
-aws ec2 describe-instances \
-  --region ap-southeast-1 \
-  --filters "Name=instance-state-name,Values=running" \
-  --query 'Reservations[].Instances[].{ID:InstanceId,Type:InstanceType}'
+# 2. Kích hoạt thủ công một AWS Glue Crawler để quét dữ liệu mới trên S3
+aws glue start-crawler --name my-s3-raw-data-crawler
+
+# 3. Kích hoạt trực tiếp một Glue ETL Job từ Terminal và kiểm tra mã thực thi
+aws glue start-job-run --job-name my-data-transform-job
+
+# 4. Kiểm tra trạng thái hoạt động (Bật/Tắt) của quy tắc lập lịch EventBridge
+aws events describe-rule --name daily-etl-schedule-rule \
+  --query '{Name:Name,State:State,Schedule:ScheduleExpression}'
+
 ```
 
-> **Bài học:** AWS CLI là công cụ không thể thiếu cho kỹ sư DevOps - mọi tài nguyên có thể quản lý trên Console đều có thể tự động hóa qua CLI. Thành thạo nó là bước đầu tiên để xây dựng deployment pipeline.
+---
+
+### Nội Dung Học Tập Đã Hoàn Thành
+
+| Ngày học | Nội dung bài học tập trung | Dịch vụ AWS liên quan |
+| --- | --- | --- |
+| **25/05/2026** | Quản trị cơ sở dữ liệu quan hệ bảo mật và cô lập mạng | Amazon RDS PostgreSQL, KMS |
+| **25/05/2026** | Khám phá dữ liệu tự động và xây dựng đường ống ETL | AWS Glue (Crawler, Data Catalog, Job) |
+| **25/05/2026** | Lập lịch Cron Job và điều phối sự kiện serverless | Amazon EventBridge |
 
 ---
 
-### Lý thuyết: NoSQL với Amazon DynamoDB
+### Bài học rút ra từ Ngày 3
 
-**Amazon DynamoDB** là cơ sở dữ liệu NoSQL serverless, fully managed, cung cấp hiệu suất mili giây đơn ở mọi quy mô - không cần lập kế hoạch capacity, không có maintenance windows.
-
-**Các khái niệm cốt lõi:**
-- **Mô hình dữ liệu:** Tables, Items (hàng), Attributes (cột) - không cần schema cố định.
-- **Primary Keys:**
-  - *Chỉ Partition Key* (đơn giản): ví dụ `UserId`
-  - *Partition Key + Sort Key* (kết hợp): ví dụ `UserId` + `OrderDate` cho dữ liệu chuỗi thời gian
-- **Chế độ đọc/ghi:**
-  - *Provisioned*: Capacity cố định, workload có thể đoán trước, rẻ hơn ở quy mô ổn định
-  - *On-Demand*: Tự động mở rộng ngay lập tức, trả theo request - lý tưởng cho traffic không đoán trước
-- **DynamoDB Streams:** Ghi nhận thay đổi cấp item theo thứ tự - hỗ trợ kiến trúc event-driven (ví dụ: trigger Lambda mỗi khi dữ liệu thay đổi).
-- **Global Tables:** Sao chép đa region, đa master để có latency dưới 10ms ở bất kỳ đâu trên thế giới.
-- **DAX (DynamoDB Accelerator):** Cache in-memory giảm latency đọc từ mili giây xuống **micro giây**.
-
-> **Bài học:** Chọn DynamoDB khi cần mở rộng ngang, schema linh hoạt và latency mili giây ổn định - hoàn hảo cho bảng xếp hạng game, session store, telemetry IoT và giỏ hàng. Chọn RDS khi cần join phức tạp, ACID transactions và schema nghiêm ngặt.
+1. **Nguyên tắc cô lập cơ sở dữ liệu:** Tuyệt đối không để cơ sở dữ liệu RDS tiếp xúc trực tiếp với Internet công cộng (`Publicly Accessible = No`). Chỉ cho phép truy cập thông qua Security Group nội bộ từ EC2 hoặc Glue giúp thu hẹp tối đa bề mặt tấn công mạng.
+2. **Sức mạnh của Meta-data:** AWS Glue Data Catalog đóng vai trò cực kỳ quan trọng như một cuốn từ điển dữ liệu trung tâm. Nó giúp lập chỉ mục cấu hình dữ liệu trên S3 mà không cần di chuyển dữ liệu thật, giúp các tác vụ phân tích và huấn luyện ML sau này trở nên rõ ràng và có cấu trúc.
+3. **Chuyển đổi sang Serverless Event-driven:** Việc thay thế các tập lệnh cron-job truyền thống chạy trên máy chủ bằng EventBridge giúp hệ thống loại bỏ hoàn toàn chi phí duy trì máy chủ bật 24/7. Toàn bộ hạ tầng kích hoạt và biến đổi dữ liệu (Glue + EventBridge) chỉ tính phí trên từng giây thực thi, tối ưu hóa triệt để chi phí vận hành (OpEx).
 
 ---
 
-### Lý thuyết: CloudFront & Lambda@Edge
-
-**Amazon CloudFront** là **CDN (Content Delivery Network)** toàn cầu của AWS - cache và phân phối nội dung từ các **Edge Locations** gần người dùng nhất, giảm đáng kể latency cho assets tĩnh, APIs và media streaming.
-
-**Lambda@Edge** mở rộng AWS Lambda để chạy tại các edge location của CloudFront - cho phép tùy chỉnh request/response mà không cần định tuyến traffic về origin server.
-
-**Các khái niệm quan trọng:**
-- **Distributions:** Cấu hình phân phối CloudFront trỏ đến các **origins** (S3, ALB, EC2, custom HTTP endpoints).
-- **Behaviors:** Các quy tắc ánh xạ URL pattern đến origin và cấu hình cache cụ thể.
-- **Cache policies & Origin request policies:** Kiểm soát chi tiết những gì được cache và những gì được chuyển tiếp đến origin.
-- **Ép buộc HTTPS:** Buộc toàn bộ traffic dùng HTTPS qua chứng chỉ SSL tùy chỉnh bằng AWS Certificate Manager (ACM).
-- **Triggers của Lambda@Edge:**
-  - *Viewer Request*: Sửa đổi request trước khi CloudFront kiểm tra cache
-  - *Origin Request*: Sửa đổi những gì chuyển tiếp đến origin (cache miss)
-  - *Origin Response*: Sửa đổi phản hồi từ origin trước khi được cache
-  - *Viewer Response*: Sửa đổi phản hồi cuối cùng gửi đến client
-- **Use cases:** Viết lại URL, A/B testing tại edge, xác thực JWT không cần backend, tối ưu hóa ảnh.
-
----
-
-### Thực hành: Triển khai Web Server trên EC2 với VPC tùy chỉnh
-
-#### Bước 1: Tạo VPC và Networking
-
-| Tài nguyên | Cấu hình |
-|------------|---------|
-| VPC | CIDR: `10.0.0.0/16` |
-| Public Subnet | CIDR: `10.0.1.0/24`, AZ: `ap-southeast-1a` |
-| Internet Gateway | Gắn vào VPC |
-| Route Table | Route `0.0.0.0/0` → Internet Gateway |
-
-Tạo VPC tùy chỉnh từ đầu thay vì dùng VPC mặc định giúp hiểu sâu hơn cách networking AWS thực sự hoạt động.
-
-#### Bước 2: Khởi chạy EC2 Instance làm Web Server
-
-1. Vào **EC2 Console** → **Launch Instance**.
-2. Chọn **Amazon Linux 2023 AMI** (miễn phí với free tier).
-3. Loại instance: `t2.micro`.
-4. Đặt instance trong VPC và public subnet vừa tạo.
-5. Cấu hình **Security Group**: Cho phép inbound `HTTP (port 80)` và `SSH (port 22)`.
-6. Thêm **User Data script** để tự động cài đặt và khởi động Apache khi boot:
-   ```bash
-   #!/bin/bash
-   yum update -y
-   yum install -y httpd
-   systemctl start httpd
-   systemctl enable httpd
-   echo "<h1>Hello from AWS EC2 - Ngày 3!</h1>" > /var/www/html/index.html
-   ```
-7. Khởi chạy instance và truy cập public IP để xác minh web server hoạt động.
-
-#### Bước 3: Dọn dẹp sau thực hành
-
-```bash
-# Terminate EC2 instance
-aws ec2 terminate-instances --instance-ids <instance-id>
-
-# Tách và xóa Internet Gateway
-aws ec2 detach-internet-gateway --internet-gateway-id <igw-id> --vpc-id <vpc-id>
-aws ec2 delete-internet-gateway --internet-gateway-id <igw-id>
-
-# Xóa Subnet, Route Table, rồi VPC (theo đúng thứ tự)
-aws ec2 delete-subnet --subnet-id <subnet-id>
-aws ec2 delete-route-table --route-table-id <rt-id>
-aws ec2 delete-vpc --vpc-id <vpc-id>
-```
-
-> ⚠️ Luôn dọn dẹp toàn bộ tài nguyên sau mỗi buổi thực hành để tránh chi phí bất ngờ.
-
-> **Bài học:** Hiểu networking VPC - subnets, route tables và Internet Gateways - là nền tảng để triển khai bất kỳ tài nguyên nào có thể truy cập internet trên AWS. Hầu hết mọi kiến trúc production đều bắt đầu với một VPC được thiết kế tốt.
-
----
-
-### Bài học rút ra
-
-- **AWS CLI** biến các thao tác Console thủ công thành các lệnh có thể lặp lại và viết script - thiết yếu cho tự động hóa.
-- **DynamoDB vs. RDS** không phải là tốt hơn/tệ hơn - mà là việc khớp mô hình database với access pattern cụ thể.
-- **CloudFront + Lambda@Edge** cho phép điện toán biên mạnh mẽ: bảo mật, cá nhân hóa và tối ưu hiệu suất mà không cần round-trips đến origin.
-- Xây dựng VPC từ đầu (không dùng VPC mặc định) bộc lộ cơ chế thực sự của AWS networking - subnets, routing tables và phụ thuộc internet gateway.
-- Pattern **User Data script** rất mạnh - cho phép cấu hình server hoàn toàn tự động khi khởi chạy mà không cần SSH thủ công vào.
-
----
-
-*Nguồn tài liệu chính: [First Cloud Journey - AWS Study Group](https://cloudjourney.awsstudygroup.com/)*
+*Nguồn tài liệu chính: [First Cloud Journey - AWS Study Group*](https://cloudjourney.awsstudygroup.com/)

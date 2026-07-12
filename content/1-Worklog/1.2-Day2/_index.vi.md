@@ -1,175 +1,118 @@
 ---
 title: "Ngày 2"
-date: 2026-06-08
+date: 2026-05-22
 weight: 2
 chapter: false
 pre: " <b> 1.2. </b> "
 ---
 
-# Nhật Ký Làm Việc: Giám Sát Chi Phí Nâng Cao, Thiết Lập Cảnh Báo Đa Lớp và Lý Thuyết Hạ Tầng Cơ Bản
+# Nhật Ký Làm Việc: Tối Ưu Phân Phối Tốc Độ Cao Với CloudFront, Điều Hướng Lưu Lượng Bằng ALB Và Tự Động Mở Rộng Hệ Thống Với Auto Scaling
 
-> **Ngày 2 - Thứ Hai, ngày 08/06/2026:** Hoàn thành xây dựng hệ thống cảnh báo chi phí đa tầng, thiết lập quy trình xử lý khẩn cấp và nghiên cứu sâu các lý thuyết kiến trúc đám mây và an toàn thông tin trên AWS.
+> **Ngày 2 - Thứ Sáu, ngày 22/05/2026:** Tiến hành nâng cấp hạ tầng API đơn lẻ từ Ngày 1 thành kiến trúc có tính sẵn sàng cao (High Availability) và khả năng co giãn tự động bằng cách cấu hình bộ cân bằng tải Application Load Balancer (ALB), thiết lập Auto Scaling Group cho các máy chủ EC2, và tối ưu hóa tốc độ phản hồi trên toàn cầu thông qua mạng lưới phân phối nội dung AWS CloudFront.
 
 ---
 
 ### Mục tiêu học tập trong ngày
 
-- Triển khai **Hệ thống giám sát chi phí đa lớp** nhằm chủ động ngăn ngừa phát sinh chi phí.
-- Kích hoạt dịch vụ **Cost Anomaly Detection** kết hợp quy định gắn thẻ tag tài nguyên đồng bộ.
-- Xây dựng tài liệu hướng dẫn **Quy trình xử lý chi phí khẩn cấp** bằng các lệnh tra cứu AWS CLI.
-- Nghiên cứu lý thuyết hạ tầng cốt lõi của AWS: Mô hình trách nhiệm chung, Hạ tầng toàn cầu, IAM, các loại hình dịch vụ lưu trữ và điện toán.
+- Thiết lập **Application Load Balancer (ALB)** để phân phối lưu lượng truy cập API đồng đều đến các máy chủ ảo phía sau.
+- Cấu hình **Auto Scaling Group (ASG)** kết hợp cùng Launch Template để tự động tăng/giảm số lượng EC2 instance theo tải thực tế của ứng dụng.
+- Triển khai **AWS CloudFront (CDN)** làm lớp giao tiếp ngoài cùng nhằm giảm độ trễ, tối ưu bộ nhớ đệm (Caching) và tăng cường bảo mật cho hệ thống API.
+- Thực hiện kiểm thử tính năng Failover (khắc phục sự cố tự động) và các cơ chế co giãn tài nguyên đám mây.
 
 ---
 
-### Hệ Thống Giám Sát Chi Phí & Hàng Rào Cảnh Báo
+### Điều Hướng Lưu Lượng Truy Cập Với Application Load Balancer (ALB)
 
-#### 1. Thiết lập 3 mức ngân sách với AWS Budgets
+#### 1. Cấu hình Target Group và Health Check
+- Khởi tạo một Target Group dạng `Instances` chạy giao thức HTTP trên cổng `8000` (cổng dịch vụ API từ Ngày 1).
+- Cấu hình tính năng **Health Check** (kiểm tra sức khỏe hệ thống) trỏ về đường dẫn `/health` của API với tần suất 30 giây một lần để đảm bảo ALB chỉ điều hướng traffic đến các máy chủ đang hoạt động tốt.
 
-Để kiểm soát chặt chẽ lượng credit sử dụng, tôi đã thiết lập 3 ngân sách khác nhau trên bảng quản trị chi phí:
-
-| Tên ngân sách cảnh báo | Ngưỡng giới hạn | Điều kiện kích hoạt cảnh báo |
-|---|---|---|
-| **Monthly Cap Budget** | $40.00 / tháng | Cảnh báo khi chi phí thực tế đạt **80% ($32.00)** |
-| **Warning Budget** | $20.00 / tháng | Cảnh báo khi chi phí thực tế đạt **50% ($10.00)** |
-| **Daily Safeguard Budget** | $5.00 / ngày | Cảnh báo khi chi phí thực tế đạt **100% ($5.00)** |
-
-Ngân sách theo ngày đóng vai trò như một chốt chặn nhanh, giúp phát hiện sớm các tài nguyên cấu hình sai hoặc chạy ngầm trong vòng 24 giờ thay vì đợi cộng dồn đến cuối tháng.
-
-#### 2. Cảnh báo chi phí leo thang qua CloudWatch Billing Alarms
-
-Tôi đã thiết lập các Billing Alarm trong CloudWatch sử dụng Amazon SNS để gửi thông báo khẩn cấp theo các mức độ nghiêm trọng:
-
-| Ngưỡng chi phí | Kênh nhận thông báo | Hành động vận hành |
-|---|---|---|
-| **$15.00** | Email cá nhân | Cảnh báo thông thường; kiểm tra danh sách dịch vụ đang chạy. |
-| **$35.00** | Email + SMS điện thoại | Ưu tiên cao; kiểm tra chi tiết trạng thái hoạt động của tài nguyên. |
-| **$60.00** | Email + SMS + Webhook Discord | Cảnh báo khẩn cấp; bắt đầu quy trình tắt tài nguyên khẩn cấp. |
-
-#### 3. Tự động phát hiện bất thường bằng AWS Cost Anomaly Detection (Tính năng bổ sung mới)
-
-Kích hoạt dịch vụ **AWS Cost Anomaly Detection** sử dụng thuật toán máy học (Machine Learning) để giám sát và phát hiện các chi tiêu bất thường dựa trên lịch sử sử dụng trước đó:
-- Loại giám sát: Theo dõi toàn bộ các dịch vụ AWS.
-- Ngưỡng kích hoạt: Chi phí bất thường vượt quá $5.00 trong ngày.
-- Vai trò: Gửi thông báo ngay lập tức khi phát hiện biến động chi phí đột biến mà không cần đợi chạm ngưỡng ngân sách tĩnh.
+#### 2. Triển khai Load Balancer trong VPC
+- Khởi tạo một Application Load Balancer (ALB) hoạt động ở chế độ Internet-facing (công khai).
+- Đặt ALB chạy trên nhiều **Availability Zones (AZs)** khác nhau để đảm bảo khả năng chịu lỗi nếu một trung tâm dữ liệu gặp sự cố.
+- Cấu hình Security Group cho ALB: chỉ mở cổng HTTP (`80`) và HTTPS (`443`) đón nhận yêu cầu từ người dùng công cộng.
 
 ---
 
-### Phân Tích Chi Phí Nâng Cao & Gắn Thẻ Tài Nguyên
+### Tự Động Co Giãn Hạ Tầng Với EC2 Auto Scaling
 
-#### Chính sách gắn thẻ tag tài nguyên (Resource Tagging)
+#### 1. Tạo Launch Template (Bản thiết kế máy chủ)
+- Tạo một Launch Template chứa cấu hình chuẩn hóa từ máy chủ EC2 của Ngày 1: sử dụng Amazon Linux 2023, loại instance `t3.medium`, mã nguồn API cài sẵn, và IAM Role có quyền kết nối với S3.
+- Cấu hình đoạn mã **User Data** (script chạy tự động khi khởi tạo máy chủ) để khi một EC2 mới được dựng lên, nó sẽ tự động chạy lệnh `git pull` cập nhật API, tải file `model.tar.gz` mới nhất từ S3 và kích hoạt dịch vụ FastAPI.
 
-Để thuận tiện cho việc lập báo cáo và phân bổ ngân sách trong AWS Cost Explorer, mọi tài nguyên khởi tạo đều bắt buộc phải gắn các thẻ tag phân loại rõ ràng:
+#### 2. Thiết lập Auto Scaling Group (ASG) và Chính sách mở rộng
+Tôi đã thiết lập các thông số vận hành cho nhóm tự động co giãn ASG như sau:
 
-| Thẻ khóa (Tag Key) | Giá trị ví dụ | Ý nghĩa và mục đích |
+| Thông số ASG | Cấu hình mặc định | Ý nghĩa và mục đích vận hành |
 |---|---|---|
-| `Project` | `cloud-training` | Phân loại chi phí theo từng dự án cụ thể. |
-| `Environment` | `dev` / `testing` | Phân biệt tài nguyên phòng Lab thử nghiệm và môi trường kiểm thử. |
-| `Author` | `intern-dev` | Xác định kỹ sư chịu trách nhiệm khởi tạo và quản lý tài nguyên. |
+| **Desired Capacity** | 2 instances | Số lượng máy chủ đích hệ thống luôn duy trì trong trạng thái bình thường. |
+| **Minimum Capacity** | 2 instances | Số lượng máy chủ tối thiểu để đảm bảo tính sẵn sàng cao (High Availability). |
+| **Maximum Capacity** | 5 instances | Giới hạn tối đa số máy chủ được phép mở rộng để kiểm soát chi phí (OpEx). |
 
-#### Bảng điều khiển CloudWatch giám sát tập trung
-
-- Thiết lập một **Bảng điều khiển giám sát (Dashboard)** trong CloudWatch hiển thị đồng thời biểu đồ CPU của EC2 và dự báo chi phí ước tính trong tháng.
-- Theo dõi các số liệu cấp ứng dụng để phòng ngừa trường hợp vòng lặp vô hạn trong code thử nghiệm gây tốn tài nguyên.
+- **Target Tracking Scaling Policy:** Kích hoạt chính sách co giãn tự động dựa trên mức độ sử dụng CPU trung bình (`Average CPU Utilization`). Khi tải CPU của toàn hệ thống vượt ngưỡng **70%**, ASG sẽ tự động kích hoạt khởi tạo thêm máy chủ EC2 mới để gánh tải.
 
 ---
 
-### Quy Trình Xử Lý Chi Phí Khẩn Cấp & Dọn Dẹp Tài Nguyên
+### Tối Ưu Hóa Tốc Độ Và Phân Phối Qua AWS CloudFront
 
-#### 1. Các lệnh tra cứu khẩn cấp qua AWS CLI
+#### 1. Cấu hình CloudFront Distribution
+- Thiết lập một CloudFront Distribution đóng vai trò làm lớp lá chắn ngoài cùng, cấu hình Endpoint của ALB làm **Origin** (Nguồn phân phối gốc).
+- Cấu hình điều hướng toàn bộ lưu lượng HTTP sang HTTPS tại các máy chủ Edge Location của CloudFront để bảo mật đường truyền.
 
-Khi nhận được cảnh báo chi phí bất thường, thực hiện ngay các lệnh CLI sau trên Terminal để quét và phát hiện các dịch vụ đang chạy gây tốn phí:
+#### 2. Tối ưu bộ nhớ đệm (Cache Behavior Management)
+Để cân bằng giữa tốc độ phản hồi và tính chính xác của dữ liệu, tôi thiết lập chính sách cache tách biệt:
+
+| Đường dẫn API (Path) | Cấu hình Cache | Lý do kỹ thuật |
+|---|---|---|
+| `/static/*` hoặc tệp đồ họa | Caching Enabled (Mặc định 24h) | Giảm tải hoàn toàn cho máy chủ EC2 gốc bằng cách lưu giữ nội dung tĩnh ở Edge Locations gần người dùng. |
+| `/predict` (API dự đoán mô hình) | Caching Disabled (Bỏ qua Cache) | Đảm bảo mỗi yêu cầu dự đoán mới gửi lên đều được ALB điều hướng trực tiếp về EC2 để xử lý dữ liệu thời gian thực. |
+
+---
+
+### Các Lệnh Vận Hành Và Giám Sát Qua AWS CLI
+
+Dưới đây là các lệnh CLI phục vụ việc kiểm tra trạng thái hoạt động của bộ cân bằng tải và các tiến trình co giãn tự động:
 
 ```bash
-# 1. Liệt kê các máy chủ ảo EC2 đang chạy trong khu vực (Region) hiện tại
-aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" \
-  --query 'Reservations[].Instances[].{ID:InstanceId,Type:InstanceType,Zone:Placement.AvailabilityZone}' \
-  --output table
+# 1. Liệt kê trạng thái sức khỏe của các EC2 instance thuộc Target Group của ALB
+aws elbv2 describe-target-health \
+  --target-group-arn arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/my-api-tg/abc123xyz
 
-# 2. Liệt kê toàn bộ các cơ sở dữ liệu RDS đang hoạt động
-aws rds describe-db-instances \
-  --query 'DBInstances[].{DBIdentifier:DBInstanceIdentifier,Engine:Engine,Status:DBInstanceStatus}' \
-  --output table
+# 2. Kiểm tra thông tin chi tiết và số lượng máy chủ hiện tại của Auto Scaling Group
+aws autoscaling describe-auto-scaling-groups \
+  --auto-scaling-group-names my-api-asg \
+  --query 'AutoScalingGroups[].{Name:AutoScalingGroupName,Desired:DesiredCapacity,Instances:Instances[].InstanceId}'
 
-# 3. Tìm các ổ cứng EBS đang rảnh rỗi (vẫn bị tính phí ngay cả khi máy chủ đã tắt)
-aws ec2 describe-volumes --filters "Name=status,Values=available" \
-  --query 'Volumes[].{VolumeID:VolumeId,Size:Size,Zone:AvailabilityZone}' \
-  --output table
+# 3. Tạo một yêu cầu xóa cache thủ công (Invalidation) trên CloudFront khi cập nhật giao diện
+aws cloudfront create-invalidation \
+  --distribution-id E1A2B3C4D5E6F7 \
+  --paths "/static/*"
 
-# 4. Tìm các địa chỉ IP tĩnh (Elastic IP) không gắn với máy chủ nào (bị tính phí treo máy)
-aws ec2 describe-addresses \
-  --query 'Addresses[?AssociationId==null].{IP:PublicIp,AllocationId:AllocationId}' \
-  --output table
+# 4. Truy vấn lịch sử hoạt động co giãn (Scaling Activities) để xem ASG đã tăng/giảm máy chủ ra sao
+aws autoscaling describe-scaling-activities \
+  --auto-scaling-group-name my-api-asg \
+  --max-items 3
+
 ```
-
-#### 2. Quy trình xử lý khẩn cấp từng bước
-1. Đăng nhập ngay vào AWS Console bằng tài khoản quản trị.
-2. Dừng (Stop) hoặc xóa hoàn toàn (Terminate) các máy chủ ảo `EC2` và xóa các cụm dữ liệu `RDS` không sử dụng.
-3. Tiến hành xóa các ổ cứng `EBS` đang ở trạng thái `available` và giải phóng (Release) các địa chỉ `Elastic IP` đang rỗi.
-4. Tắt các cấu hình thử nghiệm mô hình AI trên Bedrock và dọn dẹp các đường dẫn hàm Lambda cũ.
-
----
-
-### Lý Thuyết Kiến Trúc Đám Mây Nền Tảng
-
-#### Mô hình dịch vụ điện toán đám mây
-- **Elasticity (Tính co giãn):** Khả năng tự động tăng hoặc giảm tài nguyên tùy theo lưu lượng truy cập thực tế.
-- **Dịch chuyển chi phí:** Chuyển đổi từ chi phí đầu tư hạ tầng ban đầu (CapEx) sang chi phí vận hành trả theo mức sử dụng (OpEx).
-- **Hạ tầng toàn cầu:** Khả năng triển khai ứng dụng đến các vùng địa lý khác nhau trên thế giới một cách nhanh chóng.
-
-| Mô hình dịch vụ | Ví dụ trên AWS | Phần người dùng tự quản lý |
-|---|---|---|
-| **IaaS (Hạ tầng như một dịch vụ)** | Amazon EC2, VPC | Hệ điều hành, thư viện chạy code, mã nguồn ứng dụng và cấu hình mạng. |
-| **PaaS (Nền tảng như một dịch vụ)** | AWS Elastic Beanstalk, RDS | Mã nguồn ứng dụng và cấu trúc bảng dữ liệu. |
-| **SaaS (Phần mềm như một dịch vụ)** | Amazon WorkMail, Chime | Không cần quản lý hạ tầng; sử dụng phần mềm trực tiếp qua trình duyệt/ứng dụng. |
-
-#### Hạ tầng toàn cầu của AWS
-- **Regions (Vùng địa lý):** Các khu vực địa lý độc lập chứa nhiều trung tâm dữ liệu. Dữ liệu sẽ lưu trữ cố định tại Region đã chọn trừ khi được người dùng cấu hình sao chép đi nơi khác.
-- **Availability Zones (AZs):** Các trung tâm dữ liệu vật lý riêng biệt trong một Region, kết nối bằng mạng cáp quang tốc độ cao. Triển khai tài nguyên trên nhiều AZ giúp hệ thống có **Độ sẵn sàng cao (High Availability)**.
-- **Edge Locations (Điểm phân phối):** Điểm đặt máy chủ bộ nhớ đệm thuộc mạng lưới CDN CloudFront của AWS, giúp truyền tải nội dung tĩnh đến người dùng ở vị trí gần nhất với độ trễ thấp nhất.
-
----
-
-### Bảo Mật Hệ Thống & Quản Lý Danh Tính (IAM)
-
-- **Mô hình trách nhiệm chung (Shared Responsibility Model):**
-  - **Trách nhiệm của AWS (OF the cloud):** Bảo mật hạ tầng vật lý của trung tâm dữ liệu, thiết bị mạng, phần cứng máy chủ và lớp ảo hóa.
-  - **Trách nhiệm của khách hàng (IN the cloud):** Bảo mật hệ điều hành, cấu hình tường lửa (Security Group), phân quyền truy cập người dùng và mã hóa dữ liệu.
-- **Nguyên tắc quản trị IAM:**
-  - **Bảo vệ tài khoản Root:** Kích hoạt xác thực 2 lớp (MFA) và hạn chế sử dụng tài khoản Root cho công việc hàng ngày.
-  - **Nguyên tắc quyền tối thiểu (Least Privilege):** Chỉ cấp đúng và đủ những quyền hạn cần thiết để thực hiện công việc.
-  - **Quản lý theo Nhóm (Groups):** Gán quyền thông qua IAM Group thay vì phân quyền riêng lẻ cho từng người dùng.
-  - **Cấu hình bằng JSON:** Sử dụng cấu trúc tài liệu JSON để mô tả chi tiết các hành động (Actions), tài nguyên (Resources) và điều kiện (Conditions) được phép truy cập.
-
----
-
-### Tổng Quan Các Dịch Vụ Lưu Trữ & Cơ Sở Dữ Liệu
-
-- **Amazon S3 (Simple Storage Service):**
-  - Dịch vụ lưu trữ đối tượng với độ bền vững dữ liệu đạt **99.999999999% (11 số 9)**.
-  - Hỗ trợ phân lớp lưu trữ (S3 Standard, Standard-IA, Glacier) để tối ưu hóa chi phí dựa trên tần suất truy xuất tệp tin.
-- **Amazon RDS:** Cơ sở dữ liệu quan hệ được quản lý tự động, hỗ trợ sao lưu dự phòng định kỳ, vá lỗi bảo mật phần mềm và đồng bộ bản sao.
-- **AWS Lambda:** Dịch vụ serverless thực thi code theo sự kiện, tự động mở rộng tài nguyên và không yêu cầu quản lý máy chủ.
 
 ---
 
 ### Nội Dung Học Tập Đã Hoàn Thành
 
 | Ngày học | Nội dung bài học tập trung | Dịch vụ AWS liên quan |
-|---|---|---|
-| **08/06/2026** | Hạ tầng và cấu hình máy chủ ảo | Amazon EC2, AMI, Instance Types |
-| **08/06/2026** | Phân quyền truy cập hệ thống | AWS IAM, Roles, Policies |
-| **08/06/2026** | Môi trường lập trình tích hợp | AWS Cloud9, Instance Profiles |
-| **08/06/2026** | Lưu trữ đối tượng và lưu trữ web tĩnh | Amazon S3, S3 Bucket Policies |
-| **08/06/2026** | Cơ sở dữ liệu và quy trình sao lưu | Amazon RDS, DB Engines |
+| --- | --- | --- |
+| **22/05/2026** | Điều phối lưu lượng mạng và Kiểm tra sức khỏe hệ thống | Application Load Balancer (ALB) |
+| **22/05/2026** | Tự động hóa quy mô máy chủ theo tải thực tế | EC2 Auto Scaling Group, Launch Templates |
+| **22/05/2026** | Mạng lưới phân phối nội dung toàn cầu và Tối ưu hóa Cache | AWS CloudFront (CDN) |
 
 ---
 
 ### Bài học rút ra từ Ngày 2
 
-1. **Phòng thủ chi phí nhiều lớp:** Việc kết hợp ngân sách tĩnh (Budgets), cảnh báo chi phí (Alarms) và giám sát thông minh (Anomaly Detection) giúp bảo vệ tài khoản tối đa trước các rủi ro phát sinh hóa đơn lớn.
-2. **Kỷ luật tagging:** Gắn thẻ tag tài nguyên là điều kiện bắt buộc để quản lý tài chính đám mây hiệu quả.
-3. **Kỹ năng xử lý khẩn cấp:** Xây dựng sẵn kịch bản dọn dẹp và sử dụng các lệnh CLI để nhanh chóng quét các tài nguyên rác (như ổ cứng EBS chưa dùng hay IP tĩnh chưa gắn máy chủ) là kỹ năng vận hành thực tế cực kỳ quan trọng đối với kỹ sư đám mây.
+1. **Kiến trúc phi trạng thái (Stateless Architecture):** Để Auto Scaling hoạt động hoàn hảo, mã nguồn API chạy trên EC2 phải hoàn toàn "phi trạng thái". Việc Ngày 1 tách biệt tệp mô hình nặng (`model.tar.gz`) sang S3 giúp các máy chủ mới sinh ra từ ASG có thể dễ dàng tải cấu hình về chạy ngay mà không bị ràng buộc dữ liệu cục bộ.
+2. **Sự kết hợp giữa ALB và ASG:** Bộ đôi này tạo nên xương sống cho tính sẵn sàng cao. Khi chủ động thử nghiệm tắt (Terminate) một instance EC2, hệ thống tự động phát hiện lỗi nhờ ALB Health Check và ASG lập tức khởi tạo một máy chủ thay thế trong vài phút (Self-healing).
+3. **Chiến lược phân lớp hạ tầng:** Đặt CloudFront ở trước ALB giúp tăng tốc độ phản hồi đáng kể cho người dùng cuối trên toàn cầu nhờ mạng lưới mạng lõi của AWS, đồng thời che giấu địa chỉ IP thật của Load Balancer, tạo thêm một lớp bảo mật ngăn chặn các cuộc tấn công DDoS trực diện.
 
 ---
 
-*Nguồn tài liệu chính: [First Cloud Journey - AWS Study Group](https://cloudjourney.awsstudygroup.com/)*
+*Nguồn tài liệu chính: [First Cloud Journey - AWS Study Group*](https://cloudjourney.awsstudygroup.com/)

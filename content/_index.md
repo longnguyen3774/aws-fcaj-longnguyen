@@ -4,32 +4,9 @@ date: 2026-01-01
 weight: 1
 chapter: false
 ---
-    
+
 # Internship Report
 ### Student 1 Information:
-&emsp; **Full Name:** Tran Trong Thanh
-
-&emsp; **Phone Number:** 0966777941
-
-&emsp; **Email:** trongthanh1152004@gmail.com
-
-&emsp; **University:** Ho Chi Minh City University of Technology
-
-&emsp; **Major:** Data Science
-
-&emsp; **Class:** 22DKHA1
-
-&emsp; **Internship Company:** Amazon Web Services Vietnam Co., Ltd.
-
-&emsp; **Internship Position:** FCJ Data Engineer Intern
-
-&emsp; **Internship Duration:** From 20/04/2026 to 15/07/2026
-
-![Your profile picture](/images/avatar1.png)
-
----
-
-### Student 2 Information:
 &emsp; **Full Name:** Nguyen Phi Long
 
 &emsp; **Phone Number:** 0786990980
@@ -48,7 +25,30 @@ chapter: false
 
 &emsp; **Internship Duration:** From 20/04/2026 to 15/07/2026
 
-![Student 2 profile picture](/images/avatar2.jpg)
+![Student 1 profile picture](/images/avatar1.jpg)    
+
+---
+
+### Student 2 Information:
+&emsp; **Full Name:** Tran Trong Thanh
+
+&emsp; **Phone Number:** 0966777941
+
+&emsp; **Email:** trongthanh1152004@gmail.com
+
+&emsp; **University:** Ho Chi Minh City University of Technology
+
+&emsp; **Major:** Data Science
+
+&emsp; **Class:** 22DKHA1
+
+&emsp; **Internship Company:** Amazon Web Services Vietnam Co., Ltd.
+
+&emsp; **Internship Position:** FCJ Data Engineer Intern
+
+&emsp; **Internship Duration:** From 20/04/2026 to 15/07/2026
+
+![Student 2 profile picture](/images/avatar2.png)
 
 ---
 

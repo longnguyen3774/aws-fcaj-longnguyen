@@ -1,175 +1,117 @@
 ---
 title: "Day 2"
-date: 2026-06-08
+date: 2026-05-22
 weight: 2
 chapter: false
 pre: " <b> 1.2. </b> "
 ---
 
-# Work Log: Advanced Cost Auditing, Multi-Tier Monitoring, and Core Infrastructure Concepts
+# Work Log: High-Performance Distribution with CloudFront, Traffic Routing via ALB, and Dynamic Scalability with Auto Scaling
 
-> **Day 2 - Monday, June 08, 2026:** Designed a multi-layered cost alerting system, established an operational emergency response protocol, and studied core cloud architecture and security principles.
+> **Day 2 - Friday, May 22, 2026:** Upgraded the single-instance API infrastructure from Day 1 into a highly available (High Availability) and auto-scaling architecture. Configured an Application Load Balancer (ALB), established an Auto Scaling Group for EC2 instances, and optimized global response latency using the AWS CloudFront content delivery network.
 
 ---
 
 ### Objectives for the Day
 
-- Implement a **Multi-Level Monitoring System** to prevent unexpected billing.
-- Deploy **Cost Anomaly Detection** and resource tagging policies for granular expense tracking.
-- Document an **Emergency Cost Control Runbook** featuring AWS CLI audit commands.
-- Study core AWS theoretical concepts: Global Infrastructure, Identity and Access Management (IAM), and Shared Responsibility.
+- Implement an **Application Load Balancer (ALB)** to distribute API incoming traffic evenly across backend virtual servers.
+- Configure an **Auto Scaling Group (ASG)** coupled with Launch Templates to dynamically scale EC2 instances based on real-time application load.
+- Deploy **AWS CloudFront (CDN)** as the outermost edge layer to reduce latency, optimize edge caching, and enhance overall API security.
+- Perform operational failover testing and validate dynamic cloud resource scaling policies.
 
 ---
 
-### Multi-Level Monitoring & Billing Safeguards
+### Traffic Routing & Balancing with Application Load Balancer (ALB)
 
-#### 1. Three-Tier AWS Budget Thresholds
+#### 1. Target Group and Health Check Configuration
+- Provisioned an `Instance`-based Target Group routing traffic over HTTP on port `8000` (the dedicated API service port established on Day 1).
+- Configured a precise **Health Check** policy targeting the `/health` endpoint of the API every 30 seconds, ensuring the ALB only routes active traffic to healthy, operational nodes.
 
-To ensure comprehensive cost visibility, I established three distinct budgets in the billing dashboard:
-
-| Alert Identity | Target Limit | Condition for Alert |
-|---|---|---|
-| **Monthly Cap Budget** | $40.00 / month | Alert at 80% ($32.00) actual spend |
-| **Warning Budget** | $20.00 / month | Alert at 50% ($10.00) actual spend |
-| **Daily Safeguard Budget** | $5.00 / day | Alert at 100% ($5.00) actual spend |
-
-The daily budget acts as a rapid-response check, detecting runaway workloads within 24 hours rather than allowing costs to accumulate over a month.
-
-#### 2. CloudWatch Billing Alarms
-
-I configured Billing Alarms in the CloudWatch console using Amazon SNS to route notifications through escalating communication channels:
-
-| Expense Target | Notification Method | Operational Action |
-|---|---|---|
-| **$15.00** | Email Notification | Standard alert; check active services. |
-| **$35.00** | Email + SMS Alert | High priority; verify resource status. |
-| **$60.00** | Email + SMS + Discord Hook | Emergency alert; initiate resource teardown protocol. |
-
-#### 3. AWS Cost Anomaly Detection (New Feature Added)
-
-Activated **AWS Cost Anomaly Detection** using a subscription monitor. This service applies machine learning algorithms to historical usage patterns to detect unusual spending spikes:
-- Monitor Type: AWS Services.
-- Alert Threshold: $5.00 daily impact.
-- Outcome: Sends immediate notifications upon detecting abnormal spending trends, bypassing standard static budget limits.
+#### 2. Load Balancer Deployment in VPC
+- Launched an Internet-facing Application Load Balancer (ALB) stripped across multiple **Availability Zones (AZs)** to achieve maximum fault tolerance in the event of a datacenter outage.
+- Restructured Security Groups for the ALB to exclusively listen to public inbound traffic on standard HTTP (`80`) and HTTPS (`443`) ports.
 
 ---
 
-### Advanced Cost Analytics & Custom Instrumentation
+### Dynamic Elasticity with EC2 Auto Scaling
 
-#### Resource Tagging Scheme
+#### 1. Launch Template Configuration (Server Blueprint)
+- Designed a standardized Launch Template incorporating configurations from the Day 1 machine: utilizing Amazon Linux 2023, instance type `t3.medium`, pre-packaged API code, and an IAM Execution Role with secure S3 read capabilities.
+- Configured custom **User Data** execution scripts: when a new EC2 instance is launched, it automatically executes a `git pull` to fetch the latest API revision, downloads the most recent `model.tar.gz` archive from S3, and spins up the FastAPI daemon.
 
-To organize cost allocation reports, I implemented a strict tagging policy for all provisioned infrastructure. This enables granular cost tracking by project, deployment stage, and author in AWS Cost Explorer:
+#### 2. Auto Scaling Group (ASG) & Scaling Policies
+Established clear resource boundaries for the auto-scaling fleet to maintain operational efficiency:
 
-| Tag Key | Example Value | Description |
+| ASG Parameter | Target Capacity | Operational Metric & Purpose |
 |---|---|---|
-| `Project` | `cloud-training` | Associates resources with a specific project. |
-| `Environment` | `dev` / `testing` | Distinguishes development sandboxes from testing stages. |
-| `Author` | `intern-dev` | Identifies the engineer responsible for resource creation. |
+| **Desired Capacity** | 2 instances | The target baseline fleet size maintained during steady-state operations. |
+| **Minimum Capacity** | 2 instances | The lower bound required to guarantee multi-AZ High Availability. |
+| **Maximum Capacity** | 5 instances | The ceiling limit utilized to safeguard against runaway Operational Expenses (OpEx). |
 
-#### CloudWatch Metrics & Dashboards
-
-- Created a consolidated **Cost & Health Dashboard** in CloudWatch, graphing EC2 CPU metrics alongside monthly estimated billing charges.
-- Monitored application-level metrics to ensure test scripts did not enter infinite loops or generate redundant API calls.
+- **Target Tracking Scaling Policy:** Activated automated tracking bound to the `Average CPU Utilization` metric. If the aggregate CPU utilization across the fleet passes a **70%** threshold, the ASG immediately provisions supplementary EC2 instances to distribute the compute load.
 
 ---
 
-### Emergency Cost Control & Cleanup Protocol
+### Global Acceleration & Optimization with AWS CloudFront
 
-#### 1. CLI Resource Discovery Commands
+#### 1. CloudFront Distribution Mapping
+- Deployed a CloudFront Distribution acting as the public-facing gateway, mapping the external ALB endpoint as the **Origin Server** (Origin).
+- Enforced strict redirect policies routing all standard HTTP web requests to encrypted HTTPS connections at the CloudFront Edge network layer.
 
-When an anomaly detection or billing alert is triggered, run these diagnostic CLI commands to identify active, high-cost resources:
+#### 2. Cache Behavior Management
+Implemented granular caching rules to balance execution speed against real-time data integrity requirements:
+
+| API Path Pattern | Cache State | Technical Justification |
+|---|---|---|
+| `/static/*` or asset directories | Caching Enabled (Default 24h) | Offloads static heavy content to global Edge Locations close to users, drastically dropping backend EC2 request loads. |
+| `/predict` (Model Inference API) | Caching Disabled (Bypass Cache) | Bypasses caching entirely to ensure every distinct inference request is routed directly to the backend EC2 fleet for real-time model evaluation. |
+
+---
+
+### Operational CLI & Diagnostic Commands
+
+The following AWS CLI commands were executed to monitor target pool health, verify scaling metrics, and force edge synchronization:
 
 ```bash
-# 1. List all active EC2 instances across the current region
-aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" \
-  --query 'Reservations[].Instances[].{ID:InstanceId,Type:InstanceType,Zone:Placement.AvailabilityZone}' \
-  --output table
+# 1. Query the operational health status of backend EC2 instances inside the ALB Target Group
+aws elbv2 describe-target-health \
+  --target-group-arn arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/my-api-tg/abc123xyz
 
-# 2. Identify all running database instances and their operational state
-aws rds describe-db-instances \
-  --query 'DBInstances[].{DBIdentifier:DBInstanceIdentifier,Engine:Engine,Status:DBInstanceStatus}' \
-  --output table
+# 2. Inspect active capacity metrics and fleet membership for the Auto Scaling Group
+aws autoscaling describe-auto-scaling-groups \
+  --auto-scaling-group-names my-api-asg \
+  --query 'AutoScalingGroups[].{Name:AutoScalingGroupName,Desired:DesiredCapacity,Instances:Instances[].InstanceId}'
 
-# 3. Locate unattached EBS volumes (incurring costs while idle)
-aws ec2 describe-volumes --filters "Name=status,Values=available" \
-  --query 'Volumes[].{VolumeID:VolumeId,Size:Size,Zone:AvailabilityZone}' \
-  --output table
+# 3. Issue a manual cache invalidation across CloudFront to force update static assets
+aws cloudfront create-invalidation \
+  --distribution-id E1A2B3C4D5E6F7 \
+  --paths "/static/*"
 
-# 4. Search for unassociated Elastic IP addresses (incurring hourly idle charges)
-aws ec2 describe-addresses \
-  --query 'Addresses[?AssociationId==null].{IP:PublicIp,AllocationId:AllocationId}' \
-  --output table
+# 4. Audit recent scaling history and lifecycle behaviors of the ASG fleet
+aws autoscaling describe-scaling-activities \
+  --auto-scaling-group-name my-api-asg \
+  --max-items 3
+
 ```
 
-#### 2. Emergency Shutdown Runbook
-1. Access the console via the Root or Administrator account.
-2. Stop or terminate running virtual machines (`EC2`) and delete idle database clusters (`RDS`).
-3. Delete unattached block store volumes (`EBS`) and release idle static IPs (`Elastic IPs`).
-4. Disable active model playground configurations and delete unused serverless routes.
-
 ---
 
-### Foundational Cloud Architecture Concepts
-
-#### Cloud Computing Characteristics & Service Models
-- **Elasticity:** The ability to scale resources dynamically matching demand variations.
-- **OpEx vs. CapEx:** Shifting from capital expenses (buying physical datacenters) to operational expenses (paying for resources as they are consumed).
-- **Global Deployment:** Launching systems near end-users to reduce latency.
-
-| Service Model | AWS Example | User Responsibility |
-|---|---|---|
-| **IaaS (Infrastructure as a Service)** | Amazon EC2, VPC | Operating system configuration, runtime environments, application code. |
-| **PaaS (Platform as a Service)** | AWS Elastic Beanstalk, RDS | Application code deployment and data schema definitions. |
-| **SaaS (Software as a Service)** | Amazon WorkMail, Chime | No infrastructure management; access the application directly. |
-
-#### AWS Global Infrastructure
-- **Regions:** Geographically isolated hubs containing multiple data centers. Data residency is guaranteed within the selected region unless replicated by the user.
-- **Availability Zones (AZs):** Distinct physical data centers within a Region, connected by low-latency fiber links. Deploying across multiple AZs ensures **High Availability**.
-- **Edge Locations:** Points of presence that cache static content closer to users via the Amazon CloudFront CDN, reducing latency.
-
----
-
-### Security, Identity, & Access Management (IAM)
-
-- **The Shared Responsibility Model:**
-  - **Security OF the Cloud:** AWS manages the physical security of data centers, virtualization layers, and global hardware.
-  - **Security IN the Cloud:** The customer manages OS patches, network security groups, IAM credentials, and data encryption.
-- **IAM Best Practices:**
-  - **Protect the Root Account:** Require MFA and avoid using the root account for daily operational tasks.
-  - **Principle of Least Privilege:** Grant users the minimum permissions required to perform their roles.
-  - **Group-Based Policies:** Assign IAM policies to Groups rather than individual users for easier management.
-  - **JSON Security Policies:** Define precise access rules by specifying allowed Actions, Resources, and Conditions.
-
----
-
-### Core Storage & Database Services
-
-- **Amazon S3 (Simple Storage Service):**
-  - Object-based storage designed for **99.999999999% (11 nines) durability**.
-  - Utilizes storage tiers (S3 Standard, Standard-IA, Glacier) to optimize storage costs based on data access frequency.
-- **Amazon RDS:** Relational database service that automates backups, security patching, and replica synchronization.
-- **AWS Lambda:** Event-driven compute service that executes code without server management, scaling dynamically.
-
----
-
-### Study Schedule & Topics Completed
+### Completed Core Topics & Schedule
 
 | Study Date | Core Topic Focus | Primary AWS Services Involved |
-|---|---|---|
-| **08/06/2026** | Compute Architecture & Scalability | Amazon EC2, AMI, Instance Types |
-| **08/06/2026** | Access Delegation & Policy Structuring | AWS IAM, Roles, Policies |
-| **08/06/2026** | Integrated Development Environments | AWS Cloud9, Instance Profiles |
-| **08/06/2026** | Object Storage & Web Hosting | Amazon S3, S3 Bucket Policies |
-| **08/06/2026** | Managed Databases & Backups | Amazon RDS, DB Engines |
+| --- | --- | --- |
+| **22/05/2026** | Network Traffic Routing & System Health Verification | Application Load Balancer (ALB) |
+| **22/05/2026** | Automated Server Fleets Matched to Application Load | EC2 Auto Scaling Group, Launch Templates |
+| **22/05/2026** | Global Content Delivery Network & Cache Optimization | AWS CloudFront (CDN) |
 
 ---
 
 ### Day 2 Key Takeaways
 
-1. **Defense-in-Depth Cost Strategy:** A layered alerting system (Budgets + Billing Alarms + Anomaly Detection) provides comprehensive coverage against unexpected charges.
-2. **Tagging Integrity:** Resource tagging is essential for cost management; untagged resources make it difficult to trace billing anomalies.
-3. **Operational Readiness:** Establishing an emergency cleanup runbook and using CLI commands to detect idle resources (like unattached EBS volumes and Elastic IPs) are key practices for maintaining a cost-efficient cloud environment.
+1. **Stateless Architecture Priority:** For Auto Scaling groups to execute successfully, application servers must remain entirely stateless. Offloading the heavy model assets (`model.tar.gz`) to S3 on Day 1 allowed newly spawned EC2 nodes to launch smoothly without local data binding errors.
+2. **ALB & ASG Symbiosis:** This combination forms the backbone of infrastructure resilience. Manually terminating an EC2 instance proved that the ALB health checks quickly drop unhealthy nodes, while the ASG initiates a self-healing process to bring the fleet back up to capacity within minutes.
+3. **Multi-Tiered Infrastructure Protection:** Positioning CloudFront upstream from the ALB accelerates international response times via the AWS global network backbone, while abstracting the origin load balancer IP to protect against directed DDoS attempts.
 
 ---
 
-*Source: [First Cloud Journey - AWS Study Group](https://cloudjourney.awsstudygroup.com/)*
+*Source: [First Cloud Journey - AWS Study Group*](https://cloudjourney.awsstudygroup.com/)

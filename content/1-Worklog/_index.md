@@ -1,6 +1,6 @@
 ---
 title: "Worklog"
-date: 2024-06-08
+date: 2026-06-08
 weight: 1
 chapter: false
 pre: " <b> 1. </b> "
@@ -12,6 +12,8 @@ The program spans approximately **3 months** (April 20 – July 15, 2026), cover
 
 ---
 
-**Day 1**: [Account Setup, AWS Credits & 5 Hands-On Tasks (EC2, Bedrock, Budgets, Lambda, RDS)](1.1-Day1/)
+**Day 1 - 15/05/2026**: [Model Development with SageMaker, S3 Storage, and EC2 API Deployment](1.1-Day1/)
 
-**Day 2**: [Multi-Layer Cost Monitoring, Advanced Analytics & Foundational AWS Theory](1.2-Day2/)
+**Day 2 - 22/05/2026**: [High-Performance Distribution with CloudFront, Traffic Routing via ALB, and Dynamic Scalability with Auto Scaling](1.2-Day2/)
+
+**Day 3 - 25/05/2026**: [Provisioning RDS Postgres Database, Automating ETL Workflows with AWS Glue, and Scheduling Serverless Cron Jobs via EventBridge](1.3-Day3/)
