@@ -52,10 +52,13 @@ chmod 400 fashion-key.pem
 
 # Establish SSH connection (replace with your EC2 Public IP address)
 ssh -i "fashion-key.pem" ubuntu@<PUBLIC_IP_EC2>
+
 ```
 
 ##### 2.2 Installing Base Utilities:
+
 Once connected to the EC2 Ubuntu terminal, execute the following commands to install Node.js 20.x, Nginx, PM2, PostgreSQL client, and the AWS CLI:
+
 ```bash
 # 1. Update and upgrade system packages
 sudo apt update && sudo apt upgrade -y
@@ -64,7 +67,7 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install nginx -y
 
 # 3. Add Node.js 20.x repository and install Node
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+curl -fsSL [https://deb.nodesource.com/setup_20.x](https://deb.nodesource.com/setup_20.x) | sudo -E bash -
 sudo apt install nodejs -y
 
 # 4. Verify package versions
@@ -76,58 +79,91 @@ sudo npm install -g pm2
 
 # 6. Install the AWS CLI and PostgreSQL client tools
 sudo apt install awscli postgresql-client -y
+
 ```
 
 ---
 
-#### STEP 3: Deploying Code and Configuring the Environment (.env)
+#### STEP 3: Uploading Code and Configuring the Environment (.env)
 
-##### 3.1 Clone the Application:
+##### 3.1 Compress and Upload Code from Local Machine:
+
+On your **local machine** (Terminal, Git Bash, or PowerShell), navigate to your project directory and run the following commands:
+
 ```bash
-# Create application directory
-mkdir -p /home/ubuntu/app
-cd /home/ubuntu/app
+# 1. Compress the source code (excluding local environment files, node_modules, and git history)
+# On macOS/Linux:
+tar --exclude='node_modules' --exclude='.env' --exclude='.git' -czf app.tar.gz .
 
-# Clone your GitHub repository (replace with your repository URL)
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git .
+# On Windows (PowerShell - using built-in Tar tool):
+tar --exclude='node_modules' --exclude='.env' --exclude='.git' -czf app.tar.gz .
+
+# 2. Upload the compressed package to your EC2 instance (Replace <PUBLIC_IP_EC2> with your actual EC2 IP)
+scp -i "fashion-key.pem" app.tar.gz ubuntu@<PUBLIC_IP_EC2>:/home/ubuntu/
+
+```
+
+Now, switch back to your **EC2 SSH terminal** to extract the deployment package:
+
+```bash
+# 3. Create the application directory
+mkdir -p /home/ubuntu/app
+
+# 4. Move and extract the archive into the app directory
+mv /home/ubuntu/app.tar.gz /home/ubuntu/app/
+cd /home/ubuntu/app
+tar -xzf app.tar.gz
+
+# 5. Clean up the archive file
+rm app.tar.gz
+
 ```
 
 ##### 3.2 Initialize the Secure Environment File (`.env`):
+
 Create a `.env` configuration file using Nano:
+
 ```bash
-nano .env
+nano /home/ubuntu/app/.env
+
 ```
-Paste your database, API, and credential settings:
+
+Paste your database, API, and credential settings. **Be sure to replace all placeholder values with your actual system configurations**:
+
 ```env
 # ======= DATABASE – Amazon RDS =======
-DB_HOST=training-db.c7846wiue0od.ap-southeast-1.rds.amazonaws.com
+DB_HOST=<YOUR_RDS_ENDPOINT_HERE>.rds.amazonaws.com
 DB_PORT=5432
-DB_NAME=fashiondb
-DB_USER=dbadmin
-DB_PASSWORD=Tung2004
+DB_NAME=<YOUR_DATABASE_NAME>
+DB_USER=<YOUR_DATABASE_USERNAME>
+DB_PASSWORD=<YOUR_DATABASE_PASSWORD>
 
 # ======= AWS SERVICES =======
 AWS_REGION=ap-southeast-1
-S3_BUCKET_NAME=fashion-retail-model-storage
-API_GATEWAY_URL=https://5e0wzdirtc.execute-api.ap-southeast-1.amazonaws.com/dev
+S3_BUCKET_NAME=<YOUR_S3_BUCKET_NAME>
+API_GATEWAY_URL=https://<YOUR_API_ID>[.execute-api.ap-southeast-1.amazonaws.com/dev](https://.execute-api.ap-southeast-1.amazonaws.com/dev)
 
 # ======= AUTHENTICATION =======
-JWT_SECRET=fashion_secret_key_jwt_token_retail_portal_2026
-COGNITO_USER_POOL_ID=ap-southeast-1_XXXXXXXX
-COGNITO_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxx
+JWT_SECRET=<YOUR_HIGHLY_SECURE_JWT_SECRET_KEY>
+COGNITO_USER_POOL_ID=ap-southeast-1_<YOUR_USER_POOL_ID>
+COGNITO_CLIENT_ID=<YOUR_COGNITO_CLIENT_ID>
 
 # ======= APP CONFIG =======
 NODE_ENV=production
 PORT=3000
+
 ```
+
 *Press `Ctrl + O` to write out, and `Ctrl + X` to exit.*
 
 > [!CAUTION]
-> Never commit your `.env` file to git repositories to protect database and cloud authorization credentials from leak hazards.
+> Never commit your `.env` file containing production credentials, or share it in plaintext. Keep your security keys safe at all times.
 
 ##### 3.3 Install Dependencies:
+
 ```bash
 npm install --production
+
 ```
 
 ---
@@ -145,12 +181,15 @@ pm2 list
 
 # Configure PM2 to automatically launch during system boot
 pm2 startup
+
 ```
+
 *Note: The `pm2 startup` command will display a `sudo env PATH=...` block. Copy and execute that specific command to finalize the systemd integration.*
 
 ```bash
 # Save current PM2 processes list
 pm2 save
+
 ```
 
 ---
@@ -160,14 +199,18 @@ pm2 save
 Nginx acts as the front gateway receiving public HTTP traffic on port 80 and routing requests safely to the local Node.js application on port 3000, while serving static file assets efficiently.
 
 ##### 5.1 Create Nginx Site Configuration:
+
 ```bash
 sudo nano /etc/nginx/sites-available/fashion-app
+
 ```
+
 Add the server block structure (replace with your registered domain name or public IP):
+
 ```nginx
 server {
     listen 80;
-    server_name your-domain.com www.your-domain.com;
+    server_name your-domain.com [www.your-domain.com](https://www.your-domain.com);
     client_max_body_size 20M;
 
     location / {
@@ -188,9 +231,11 @@ server {
         expires 30d;
     }
 }
+
 ```
 
 ##### 5.2 Activate Configurations and Restart Nginx:
+
 ```bash
 # Link the configuration to the enabled folder
 sudo ln -s /etc/nginx/sites-available/fashion-app /etc/nginx/sites-enabled/
@@ -204,6 +249,7 @@ sudo nginx -t
 # Restart the Nginx daemon
 sudo systemctl restart nginx
 sudo systemctl enable nginx
+
 ```
 
 ---
@@ -217,40 +263,50 @@ To secure network logins and API transactions between clients and the server, pr
 sudo apt install certbot python3-certbot-nginx -y
 
 # Request and configure SSL certificates (replace with your active A-Record domain)
-sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+sudo certbot --nginx -d your-domain.com -d [www.your-domain.com](https://www.your-domain.com)
 
 # Verify automated certificate renewal (Let's Encrypt certificates expire in 90 days)
 sudo certbot renew --dry-run
+
 ```
 
 ---
 
 #### STEP 7: Testing Integrations with AWS Cloud Services
 
-Once deployed, run the following diagnostic commands from the EC2 terminal to verify direct network connectivity to your AWS resources:
+Once deployed, run the following diagnostic commands from the EC2 terminal to verify direct network connectivity to your AWS resources. Make sure to replace the placeholder details with your actual sensitive configurations:
 
 ##### 7.1 Verify RDS Connection:
+
 ```bash
-psql -h training-db.c7846wiue0od.ap-southeast-1.rds.amazonaws.com \
-     -U dbadmin -d fashiondb \
+psql -h <YOUR_RDS_ENDPOINT_HERE>.rds.amazonaws.com \
+     -U <YOUR_DB_USER> -d <YOUR_DB_NAME> \
      -c "SELECT COUNT(*) FROM stores;"
+
 ```
+
 *Expected output: Returns active retail stores count.*
 
 ##### 7.2 Verify API Gateway & Lambda Forecast API:
+
 ```bash
-curl -X POST https://5e0wzdirtc.execute-api.ap-southeast-1.amazonaws.com/dev/predict \
+curl -X POST https://<YOUR_API_ID>[.execute-api.ap-southeast-1.amazonaws.com/dev/predict](https://.execute-api.ap-southeast-1.amazonaws.com/dev/predict) \
   -H "Content-Type: application/json" \
-  -H "x-api-key: YEUnLELr4c4tqQdnToSw43sYJRqIKBrd5WDYxZH9" \
+  -H "x-api-key: <YOUR_SECURE_API_KEY_HERE>" \
   -d '{"store_id":"20","sku":"FESH6946-S-","date":"2025-03-18"}'
+
 ```
+
 *Expected output: Responds with a 200 HTTP code and the predicted demand payload.*
 
 ##### 7.3 Verify Amazon S3 Access:
+
 ```bash
-aws s3 ls s3://fashion-retail-model-storage/models/ --region ap-southeast-1
+aws s3 ls s3://<YOUR_S3_BUCKET_NAME>/models/ --region ap-southeast-1
+
 ```
-*Expected output: Lists the three serialized model pickle files.*
+
+*Expected output: Lists the serialized model pickle files.*
 
 ---
 
@@ -259,7 +315,7 @@ aws s3 ls s3://fashion-retail-model-storage/models/ --region ap-southeast-1
 Open a web browser and navigate to `https://your-domain.com` (or your EC2 instance's Public IP). Complete the following checklist matching user roles:
 
 | Step | User Login Role | Test Actions | Expected Results |
-| :--- | :--- | :--- | :--- |
+| --- | --- | --- | --- |
 | **8.1** | **Sales Staff** | Log in with staff credentials | Access granted. Navigation sidebar is restricted and only displays the *Transactions* and *Products* tabs. |
 | **8.2** | **Store Manager** | Log in with manager credentials | Access granted. Able to edit and update *Discounts* and *Employees* within their assigned store boundary. |
 | **8.3** | **Director** | Log in with director credentials | Access granted. *Dashboard* tab displays the **Mapbox** component. Clicking a store marker displays interactive **Plotly.js** Actual vs. Forecasted graphs fetched from the AWS Lambda API. |
@@ -268,15 +324,21 @@ Open a web browser and navigate to `https://your-domain.com` (or your EC2 instan
 
 #### APPENDIX: Troubleshooting Common Deployment Issues
 
-1.  **`502 Bad Gateway` Error:**
-    *   *Cause:* The Node.js application on port 3000 is stopped or crashed.
-    *   *Solution:* Run `pm2 logs fashion-web` to identify errors and restart it with `pm2 restart fashion-web`.
-2.  **RDS Database Connection Timeout:**
-    *   *Cause:* The RDS Security Group is blocking inbound traffic on port 5432 from the EC2 instance IP.
-    *   *Solution:* Open the RDS Dashboard -> Connectivity & security -> Click on your VPC Security Group and add an Inbound rule permitting port 5432 from the EC2's security group.
-3.  **Product Images Fail to Render:**
-    *   *Cause:* The EC2 instance lacks permissions to read from the S3 bucket.
-    *   *Solution:* Attach an IAM Instance Profile containing `AmazonS3ReadOnlyAccess` permissions to your EC2 instance.
-4.  **`403 Forbidden` on Forecast API Request:**
-    *   *Cause:* Invalid or missing `x-api-key` in header metadata.
-    *   *Solution:* Double check the `API_GATEWAY_URL` and `x-api-key` configurations inside the backend `.env` file.
+1. **`502 Bad Gateway` Error:**
+* *Cause:* The Node.js application on port 3000 is stopped or crashed.
+* *Solution:* Run `pm2 logs fashion-web` to identify errors and restart it with `pm2 restart fashion-web`.
+
+
+2. **RDS Database Connection Timeout:**
+* *Cause:* The RDS Security Group is blocking inbound traffic on port 5432 from the EC2 instance IP.
+* *Solution:* Open the RDS Dashboard -> Connectivity & security -> Click on your VPC Security Group and add an Inbound rule permitting port 5432 from the EC2's security group.
+
+
+3. **Product Images Fail to Render:**
+* *Cause:* The EC2 instance lacks permissions to read from the S3 bucket.
+* *Solution:* Attach an IAM Instance Profile containing `AmazonS3ReadOnlyAccess` permissions to your EC2 instance.
+
+
+4. **`403 Forbidden` on Forecast API Request:**
+* *Cause:* Invalid or missing `x-api-key` in header metadata.
+* *Solution:* Double check the `API_GATEWAY_URL` and `x-api-key` configurations inside the backend `.env` file.

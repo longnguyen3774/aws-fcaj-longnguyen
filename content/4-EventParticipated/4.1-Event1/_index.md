@@ -1,6 +1,6 @@
 ---
 title: "Event 1"
-date: 2026-05-05
+date: 2026-06-06
 weight: 1
 chapter: false
 pre: " <b> 4.1. </b> "
@@ -13,7 +13,7 @@ pre: " <b> 4.1. </b> "
 | Field | Details |
 |-------|---------|
 | **Event Name** | AWS FIRST CLOUD AI JOURNEY MEET UP |
-| **Date & Time** | 09:00, May 05, 2026 |
+| **Date & Time** | 09:00, June 06, 2026 |
 | **Location** | 26th Floor, Bitexco Tower, 02 Hai Trieu Street, Saigon Ward, Ho Chi Minh City |
 | **Role** | Attendee |
 
@@ -126,3 +126,9 @@ Mr. Vinh shared heavy operational incidents reminiscent of Duy's experiences:
 *   **Elaborate on Troubleshooting:** When asked about past issues, describe your step-by-step troubleshooting workflow in rich detail.
 *   **End-to-End Projects:** To deploy a full E-commerce product, you need FE, BE, database clustering, and monitoring. Building comprehensive, end-to-end lab projects is crucial to compensate for a lack of formal years of experience.
 *   **No-Fear Mentality:** If you get interview invitations, go to all of them. Do not be afraid. It builds interview experience and helps you understand exactly what the market currently demands.
+
+---
+
+### Hình Ảnh Sự Kiện
+
+![AWS First Cloud AI Journey Workshop](/images/event2.jpg)

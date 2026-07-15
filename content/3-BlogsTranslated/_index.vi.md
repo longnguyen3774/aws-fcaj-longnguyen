@@ -8,7 +8,7 @@ pre: " <b> 3. </b> "
 
 
 
-Trong quá trình thực tập, mình đã dịch và tóm tắt 2 bài blog kỹ thuật của AWS xoay quanh các chủ đề về data engineering, lưu trữ đám mây và quản lý cơ sở dữ liệu. Mỗi bài được chọn vì có sự liên quan trực tiếp đến các công nghệ và dịch vụ mình làm việc trong suốt chương trình.
+Trong quá trình thực tập, mình đã dịch và tóm tắt 3 bài blog kỹ thuật của AWS xoay quanh các chủ đề về data engineering, lưu trữ đám mây và quản lý cơ sở dữ liệu. Mỗi bài được chọn vì có sự liên quan trực tiếp đến các công nghệ và dịch vụ mình làm việc trong suốt chương trình.
 
 ---
 
@@ -21,5 +21,11 @@ Blog này giới thiệu cách xây dựng Offline Feature Store bằng Amazon S
 ### [Blog 2 - Tự động hóa quá trình chuyển đổi Machine Learning lên Amazon SageMaker với LeapLogic](3.2-Blog2/)
 
 Blog này giới thiệu giải pháp LeapLogic từ AWS và Impetus giúp tự động hóa quá trình chuyển đổi các hệ thống Machine Learning sang Amazon SageMaker. Bài viết phân tích quy trình 4 bước chính của LeapLogic (Đánh giá, Tự động chuyển đổi, Kiểm thử & Xác thực, Triển khai), qua đó giúp doanh nghiệp rút ngắn thời gian chuyển đổi, giảm thiểu chi phí và rủi ro khi hiện đại hóa hạ tầng AI/ML trên đám mây.
+
+---
+
+### [Blog 3 - Xây dựng giải pháp quản lý API cho doanh nghiệp lớn với Amazon API Gateway](3.3-Blog3/)
+
+Blog này tóm tắt hướng dẫn của Roger Zhang và các cộng sự về cách xây dựng giải pháp quản lý API (APIM) quy mô doanh nghiệp bằng cách kết hợp Amazon API Gateway, AWS Lambda và Amazon DynamoDB. Bài viết phân tích kiến trúc chi tiết chia làm hai thành phần: trạng thái quản lý (APIM Portal) và trạng thái runtime (APIM Core), giúp doanh nghiệp quản lý các API một cách bảo mật, áp dụng đồng bộ các chính sách quản trị/bảo mật và tích hợp dễ dàng với các ứng dụng downstream cũng như các mô hình ngôn ngữ lớn (LLM) theo mô hình serverless.
 
 ---

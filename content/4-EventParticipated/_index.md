@@ -11,7 +11,7 @@ During my internship, I participated in four events. Each one was a memorable ex
 ### [Event 1](4.1-Event1/)
 &emsp;**Event Name:** AWS FIRST CLOUD AI JOURNEY MEET UP
 
-&emsp;**Date & Time:** 09:00, Saturday, May 05, 2026
+&emsp;**Date & Time:** 09:00, Saturday, June 06, 2026
 
 &emsp;**Location:** 26th Floor, Bitexco Tower, 02 Hai Trieu Street, Saigon Ward, Ho Chi Minh City
 
