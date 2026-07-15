@@ -10,7 +10,7 @@ pre : " <b> 5.1. </b> "
 
 Dưới đây là mô hình kiến trúc hạ tầng mạng và pipeline học máy (machine learning pipeline) được xây dựng trên nền tảng điện toán đám mây **Amazon Web Services (AWS)**:
 
-![overview](/images/5-Workshop/5.1-Workshop-overview/diagram.jpg)
+![overview](/images/5-Workshop/5.1-Workshop-Overview/diagram.jpg)
 
 #### Thành phần hệ thống
 
