@@ -21,7 +21,7 @@ The entire pipeline is orchestrated to run daily via Amazon EventBridge, ensurin
 
 > 📌 **System Architecture Diagram:**
 >
-> ![Fashion Retail Web App & ML Pipeline Architecture](/images/5-Workshop/5.1-Workshop-overview/diagram.jpg)
+> ![Fashion Retail Web App & ML Pipeline Architecture](/images/2-Proposal/architecture.jpg)
 
 **Platform at a glance:**
 
@@ -155,12 +155,12 @@ The solution consists of **six functional layers** that separate storefront traf
 
 The project implementation is divided into four main phases:
 
-```mermaid
+{{<mermaid>}}
 graph TD
     Phase1[Phase 1: Design & Networking Setup] --> Phase2[Phase 2: DB & Web Server Deployment]
     Phase2 --> Phase3[Phase 3: Glue ETL & Spark Feature Pipeline]
     Phase3 --> Phase4[Phase 4: ML Training, Serving API & EventBridge Automation]
-```
+{{</mermaid>}}
 
 1. **Phase 1: Networking & IAM Security Setup**
    * Create public and private subnets across multiple Availability Zones.

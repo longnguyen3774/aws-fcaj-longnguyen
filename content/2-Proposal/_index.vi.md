@@ -21,7 +21,7 @@ Toàn bộ pipeline được điều phối tự động chạy hàng ngày qua 
 
 > 📌 **Sơ đồ kiến trúc tổng thể:**
 >
-> ![Fashion Retail Web App & ML Pipeline Architecture](/images/5-Workshop/5.1-Workshop-overview/diagram.jpg)
+> ![Fashion Retail Web App & ML Pipeline Architecture](/images/2-Proposal/architecture.jpg)
 
 **Tổng quan nền tảng:**
 
@@ -155,12 +155,12 @@ Giải pháp được tổ chức thành **sáu lớp chức năng** giúp tách
 
 Dự án được chia thành 4 giai đoạn triển khai chính:
 
-```mermaid
+{{<mermaid>}}
 graph TD
     Phase1[Giai đoạn 1: Thiết kế & Cấu hình Mạng] --> Phase2[Giai đoạn 2: Triển khai DB & Máy chủ Web]
     Phase2 --> Phase3[Giai đoạn 3: Xây dựng Pipeline Glue ETL & Spark]
     Phase3 --> Phase4[Giai đoạn 4: Huấn luyện ML, Điểm cuối API & Tự động hóa EventBridge]
-```
+{{</mermaid>}}
 
 1. **Giai đoạn 1: Cấu hình Mạng & Bảo mật IAM**
    * Thiết lập VPC, tạo các subnet công khai và riêng tư trên nhiều Availability Zone.
