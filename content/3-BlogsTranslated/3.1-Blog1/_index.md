@@ -59,4 +59,4 @@ Building an Offline Feature Store helps enterprises standardize their Machine Le
 
 *Blog image:*
 
-![Blog 1 - Offline Feature Store](/images/Blog1.jpg)
+![Blog 1 - Offline Feature Store](/images/3-BlogsTranslated/blog1.png)

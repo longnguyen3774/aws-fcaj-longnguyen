@@ -60,4 +60,4 @@ Using LeapLogic helps businesses accelerate their cloud migration, reduce develo
 
 *Blog image:*
 
-![Blog 2 - LeapLogic Migration](/images/Blog2.jpg)
+![Blog 2 - LeapLogic Migration](/images/3-BlogsTranslated/blog2.png)

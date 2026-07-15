@@ -59,4 +59,4 @@ Việc xây dựng Offline Feature Store giúp doanh nghiệp chuẩn hóa quy t
 
 *Hình ảnh minh họa:*
 
-![Blog 1 - Offline Feature Store](/images/Blog1.jpg)
+![Blog 1 - Offline Feature Store](/images/3-BlogsTranslated/blog1.png)
