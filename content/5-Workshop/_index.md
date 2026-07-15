@@ -6,7 +6,7 @@ chapter: false
 pre: " <b> 5. </b> "
 ---
 
-# Building a Fashion Retail Web App & ML Pipeline for Sales Forecasting
+# Cloud-Native Fashion Retail Web Application & Automated ML Sales Forecasting Pipeline
 
 #### Overview
 

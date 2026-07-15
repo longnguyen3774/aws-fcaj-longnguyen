@@ -6,7 +6,7 @@ chapter: false
 pre: " <b> 5. </b> "
 ---
 
-# Xây dựng Ứng dụng Web Thời trang & Pipeline Machine Learning Dự báo Doanh số
+# Kiến trúc Ứng dụng Web Fashion Retail & Pipeline Học Máy tự động cho Dự báo Doanh thu trên Cloud-Native AWS
 
 #### Tổng quan
 
