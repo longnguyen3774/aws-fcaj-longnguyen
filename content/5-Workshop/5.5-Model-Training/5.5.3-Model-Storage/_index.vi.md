@@ -34,5 +34,5 @@ for file in files:
 
 #### Minh chứng thực tế lưu trữ trên Amazon S3:
 
-![S3 Models](/images/5-Workshop/5.5-Model-training/s3-models.png)
+![S3 Models](/images/5-Workshop/5.5-Model-Training/s3-models.png)
 

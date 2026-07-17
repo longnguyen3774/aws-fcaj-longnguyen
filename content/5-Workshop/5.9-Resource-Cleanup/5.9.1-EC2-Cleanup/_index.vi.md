@@ -12,9 +12,9 @@ pre : " <b> 5.9.1. </b> "
 
 1. Truy cập **Amazon EC2 Console** -> **Instances**.
 2. Tìm và tích chọn các máy chủ của dự án:
-   * `Web-Application-Server` (Máy chủ Frontend của Kiệt)
-   * `fashion-api-server` (Máy chủ RESTful API của Tùng)
-   * `ML-Forecast-Server` (Máy chủ huấn luyện ML của Thành)
+   * `Web-Application-Server` (Máy chủ Frontend)
+   * `fashion-api-server` (Máy chủ RESTful API)
+   * `ML-Forecast-Server` (Máy chủ huấn luyện ML)
 3. Nhấp vào nút **Instance state** ở phía trên -> Chọn **Terminate instance**.
 4. Xác nhận hành động bằng cách nhấn **Terminate** trong hộp thoại cảnh báo.
 
@@ -22,3 +22,10 @@ pre : " <b> 5.9.1. </b> "
 > * Trạng thái của instance sẽ chuyển sang `Shutting-down` và sau đó là `Terminated`.
 > * Các ổ đĩa lưu trữ EBS (Elastic Block Store) mặc định được thiết lập tự động xóa khi máy chủ bị xóa (*Delete on termination*), giúp giải phóng dung lượng lưu trữ hoàn toàn.
 
+
+
+---
+
+#### Minh chứng dọn dẹp máy chủ EC2:
+
+![EC2 Terminate](/images/5-Workshop/5.9-Resource-Cleanup/ec2-terminate.png)

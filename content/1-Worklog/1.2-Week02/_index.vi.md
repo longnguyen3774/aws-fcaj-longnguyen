@@ -1,5 +1,5 @@
 ---
-title: "Ngày 2"
+title: "Tuần 2"
 date: 2026-05-22
 weight: 2
 chapter: false
@@ -8,11 +8,11 @@ pre: " <b> 1.2. </b> "
 
 # Nhật Ký Làm Việc: Tối Ưu Phân Phối Tốc Độ Cao Với CloudFront, Điều Hướng Lưu Lượng Bằng ALB Và Tự Động Mở Rộng Hệ Thống Với Auto Scaling
 
-> **Ngày 2 - Thứ Sáu, ngày 22/05/2026:** Tiến hành nâng cấp hạ tầng API đơn lẻ từ Ngày 1 thành kiến trúc có tính sẵn sàng cao (High Availability) và khả năng co giãn tự động bằng cách cấu hình bộ cân bằng tải Application Load Balancer (ALB), thiết lập Auto Scaling Group cho các máy chủ EC2, và tối ưu hóa tốc độ phản hồi trên toàn cầu thông qua mạng lưới phân phối nội dung AWS CloudFront.
+> **Tuần 2 - Thứ Sáu, ngày 22/05/2026:** Tiến hành nâng cấp hạ tầng API đơn lẻ từ Ngày 1 thành kiến trúc có tính sẵn sàng cao (High Availability) và khả năng co giãn tự động bằng cách cấu hình bộ cân bằng tải Application Load Balancer (ALB), thiết lập Auto Scaling Group cho các máy chủ EC2, và tối ưu hóa tốc độ phản hồi trên toàn cầu thông qua mạng lưới phân phối nội dung AWS CloudFront.
 
 ---
 
-### Mục tiêu học tập trong ngày
+### Mục tiêu học tập trong tuần
 
 - Thiết lập **Application Load Balancer (ALB)** để phân phối lưu lượng truy cập API đồng đều đến các máy chủ ảo phía sau.
 - Cấu hình **Auto Scaling Group (ASG)** kết hợp cùng Launch Template để tự động tăng/giảm số lượng EC2 instance theo tải thực tế của ứng dụng.
@@ -107,7 +107,7 @@ aws autoscaling describe-scaling-activities \
 
 ---
 
-### Bài học rút ra từ Ngày 2
+### Bài học rút ra từ Tuần 2
 
 1. **Kiến trúc phi trạng thái (Stateless Architecture):** Để Auto Scaling hoạt động hoàn hảo, mã nguồn API chạy trên EC2 phải hoàn toàn "phi trạng thái". Việc Ngày 1 tách biệt tệp mô hình nặng (`model.tar.gz`) sang S3 giúp các máy chủ mới sinh ra từ ASG có thể dễ dàng tải cấu hình về chạy ngay mà không bị ràng buộc dữ liệu cục bộ.
 2. **Sự kết hợp giữa ALB và ASG:** Bộ đôi này tạo nên xương sống cho tính sẵn sàng cao. Khi chủ động thử nghiệm tắt (Terminate) một instance EC2, hệ thống tự động phát hiện lỗi nhờ ALB Health Check và ASG lập tức khởi tạo một máy chủ thay thế trong vài phút (Self-healing).

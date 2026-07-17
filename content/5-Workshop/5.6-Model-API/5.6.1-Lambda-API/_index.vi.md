@@ -244,5 +244,5 @@ def lambda_handler(event, context):
 
 #### Minh chứng hoạt động của Lambda Function:
 
-![Lambda API](/images/5-Workshop/5.6-Model-api/lambda-api.png)
+![Lambda API](/images/5-Workshop/5.6-Model-API/lambda-api.png)
 

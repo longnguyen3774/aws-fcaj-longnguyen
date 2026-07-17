@@ -1,5 +1,5 @@
 ---
-title: "Ngày 1"
+title: "Tuần 1"
 date: 2026-05-15
 weight: 1
 chapter: false
@@ -8,11 +8,11 @@ pre: " <b> 1.1. </b> "
 
 # Nhật Ký Làm Việc: Xây Dựng & Huấn Luyện Mô Hình Với SageMaker, Lưu Trữ Dữ Liệu Trên S3 Và Triển Khai API Trên EC2
 
-> **Ngày 1 - Thứ Sáu, ngày 15/05/2026:** Tập trung cấu hình môi trường xây dựng và huấn luyện mô hình máy học bằng Amazon SageMaker, quản lý tập dữ liệu cùng artifact qua Amazon S3, và triển khai mô hình hoàn chỉnh thành một API production trên máy chủ Amazon EC2.
+> **Tuần 1 - Thứ Sáu, ngày 15/05/2026:** Tập trung cấu hình môi trường xây dựng và huấn luyện mô hình máy học bằng Amazon SageMaker, quản lý tập dữ liệu cùng artifact qua Amazon S3, và triển khai mô hình hoàn chỉnh thành một API production trên máy chủ Amazon EC2.
 
 ---
 
-### Mục tiêu học tập trong ngày
+### Mục tiêu học tập trong tuần
 
 - Khởi tạo và cấu hình **Amazon SageMaker** notebook instance để xây dựng, huấn luyện và đánh giá mô hình học máy.
 - Sử dụng **Amazon S3** như một giải pháp lưu trữ bảo mật, độ bền vững cao cho các tập dữ liệu thô và các artifact (trọng số) của mô hình.
@@ -100,7 +100,7 @@ aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" \
 
 ---
 
-### Bài học rút ra từ Ngày 1
+### Bài học rút ra từ Tuần 1
 
 1. **Kiến trúc phân tách (Decoupled Architecture):** Tách biệt rõ ràng tầng tính toán hiệu năng cao (SageMaker dùng để train, EC2 dùng làm API inference) khỏi tầng lưu trữ dữ liệu (S3) giúp hệ thống linh hoạt, dễ mở rộng và tối ưu hóa chi phí vận hành.
 2. **Quản trị phân quyền liền mạch:** Việc thiết lập chính xác các IAM Role giúp các dịch vụ tự động trao đổi dữ liệu an toàn với S3 mà hoàn toàn không cần phải hardcode (viết chết) các cặp Access Key/Secret Key bên trong mã nguồn ứng dụng.

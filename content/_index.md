@@ -1,6 +1,6 @@
 ---
 title: "Internship Report"
-date: 2026-01-01
+date: 2026-04-20
 weight: 1
 chapter: false
 ---
@@ -25,7 +25,9 @@ chapter: false
 
 &emsp; **Internship Duration:** From 20/04/2026 to 15/07/2026
 
-![Student 1 profile picture](/images/avatar1.jpg)    
+<div align="center">
+  <img src="/images/avatar1.jpg" alt="Student 1 profile picture" width="300" />
+</div>
 
 ---
 
@@ -48,7 +50,9 @@ chapter: false
 
 &emsp; **Internship Duration:** From 20/04/2026 to 15/07/2026
 
-![Student 2 profile picture](/images/avatar2.png)
+<div align="center">
+  <img src="/images/avatar2.png" alt="Student 2 profile picture" width="300" />
+</div>
 
 ---
 
@@ -71,7 +75,9 @@ chapter: false
 
 &emsp; **Internship Duration:** From 20/04/2026 to 15/07/2026
 
-![Student 3 profile picture](/images/avatar3.jpg)
+<div align="center">
+  <img src="/images/avatar3.jpg" alt="Student 3 profile picture" width="300" />
+</div>
 
 ---
 
@@ -94,7 +100,9 @@ chapter: false
 
 &emsp; **Internship Duration:** From 20/04/2026 to 15/07/2026
 
-![Student 4 profile picture](/images/avatar4.jpg)
+<div align="center">
+  <img src="/images/avatar4.jpg" alt="Student 4 profile picture" width="300" />
+</div>
 
 ---
 
@@ -117,7 +125,9 @@ chapter: false
 
 &emsp; **Internship Duration:** From 20/04/2026 to 15/07/2026
 
-![Student 5 profile picture](/images/avatar5.jpg)
+<div align="center">
+  <img src="/images/avatar5.jpg" alt="Student 5 profile picture" width="300" />
+</div>
 
 
 ### Report Content

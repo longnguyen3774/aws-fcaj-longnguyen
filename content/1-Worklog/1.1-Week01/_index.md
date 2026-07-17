@@ -1,5 +1,5 @@
 ---
-title: "Day 1"
+title: "Week 1"
 date: 2026-05-15
 weight: 1
 chapter: false
@@ -8,7 +8,7 @@ pre: " <b> 1.1. </b> "
 
 # Work Log: Model Development with SageMaker, S3 Storage, and EC2 API Deployment
 
-> **Day 1 - Friday, May 15, 2026:** Focused on building and training machine learning models using Amazon SageMaker, managing datasets and artifacts via Amazon S3, and deploying the trained model as a production-ready API on Amazon EC2.
+> **Week 1 - Friday, May 15, 2026:** Focused on building and training machine learning models using Amazon SageMaker, managing datasets and artifacts via Amazon S3, and deploying the trained model as a production-ready API on Amazon EC2.
 
 ---
 
@@ -96,7 +96,7 @@ aws ec2 describe-instances --filters "Name=instance-state-name,Values=running"  
 
 ---
 
-### Day 1 Key Takeaways
+### Week 1 Key Takeaways
 
 1. **Decoupled Architecture:** Separating the compute layers (SageMaker for heavy training, EC2 for real-time inference) from the storage layer (S3) optimizes cost and performance.
 2. **Seamless Permissions:** Properly configured IAM roles allow SageMaker and EC2 to securely communicate with S3 without hardcoding access keys inside application scripts.

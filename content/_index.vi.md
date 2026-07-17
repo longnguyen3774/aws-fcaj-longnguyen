@@ -1,6 +1,6 @@
 ---
 title: "Báo cáo thực tập"
-date: 2026-01-01
+date: 2026-04-20
 weight: 1
 chapter: false
 ---
@@ -25,7 +25,9 @@ chapter: false
 
 &emsp; **Thời gian thực tập:** Từ ngày 20/04/2026 đến ngày 15/07/2026
 
-![Ảnh đại diện sinh viên 1](/images/avatar1.jpg)
+<div align="center">
+  <img src="/images/avatar1.jpg" alt="Ảnh đại diện sinh viên 1" width="300" />
+</div>
 
 ---
 
@@ -48,7 +50,9 @@ chapter: false
 
 &emsp; **Thời gian thực tập:** Từ ngày 20/04/2026 đến ngày 15/07/2026
 
-![Ảnh đại diện của sinh viên 2](/images/avatar2.png)
+<div align="center">
+  <img src="/images/avatar2.png" alt="Ảnh đại diện của sinh viên 2" width="300" />
+</div>
 
 ---
 
@@ -71,7 +75,9 @@ chapter: false
 
 &emsp; **Thời gian thực tập:** Từ ngày 20/04/2026 đến ngày 15/07/2026
 
-![Ảnh đại diện sinh viên 3](/images/avatar3.jpg)
+<div align="center">
+  <img src="/images/avatar3.jpg" alt="Ảnh đại diện sinh viên 3" width="300" />
+</div>
 
 ---
 
@@ -94,7 +100,9 @@ chapter: false
 
 &emsp; **Thời gian thực tập:** Từ ngày 20/04/2026 đến ngày 15/07/2026
 
-![Ảnh đại diện sinh viên 4](/images/avatar4.jpg)
+<div align="center">
+  <img src="/images/avatar4.jpg" alt="Ảnh đại diện sinh viên 4" width="300" />
+</div>
 
 ---
 
@@ -117,7 +125,9 @@ chapter: false
 
 &emsp; **Thời gian thực tập:** Từ ngày 20/04/2026 đến ngày 15/07/2026
 
-![Ảnh đại diện sinh viên 5](/images/avatar5.jpg)
+<div align="center">
+  <img src="/images/avatar5.jpg" alt="Ảnh đại diện sinh viên 5" width="300" />
+</div>
 
 ### Nội dung báo cáo
 
@@ -128,4 +138,3 @@ chapter: false
 5.  [Workshop](5-Workshop/)
 6.  [Tự đánh giá](6-Self-evaluation/)
 7.  [Chia sẻ, đóng góp ý kiến](7-Feedback/)
-

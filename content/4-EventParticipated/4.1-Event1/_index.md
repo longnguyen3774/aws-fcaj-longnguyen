@@ -129,6 +129,6 @@ Mr. Vinh shared heavy operational incidents reminiscent of Duy's experiences:
 
 ---
 
-### Hình Ảnh Sự Kiện
+### Event Photos
 
-![AWS First Cloud AI Journey Workshop](/images/event2.jpg)
+![AWS First Cloud AI Journey Workshop](/images/event1.jpg)

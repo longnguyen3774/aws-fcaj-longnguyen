@@ -158,5 +158,5 @@ Chúng ta triển khai lập lịch tự động theo 2 phương án chính sau:
 
 #### Minh chứng cấu hình EventBridge:
 
-![EventBridge Rule](/images/5-Workshop/5.6-Model-api/eventbridge-schedule.png)
+![EventBridge Rule](/images/5-Workshop/5.6-Model-API/eventbridge-schedule.png)
 

@@ -1,5 +1,5 @@
 ---
-title: "Day 3"
+title: "Week 3"
 date: 2026-05-25
 weight: 3
 chapter: false
@@ -8,11 +8,11 @@ pre: " <b> 1.3. </b> "
 
 # Work Log: Provisioning RDS Postgres Database, Automating ETL Workflows with AWS Glue, and Scheduling Serverless Cron Jobs via EventBridge
 
-> **Day 3 - Monday, May 25, 2026:** Focused on building a structured data persistence layer using Amazon RDS PostgreSQL, designing an automated Extract, Transform, and Load (ETL) data pipeline via AWS Glue, and establishing time-based scheduling mechanisms using Amazon EventBridge.
+> **Week 3 - Monday, May 25, 2026:** Focused on building a structured data persistence layer using Amazon RDS PostgreSQL, designing an automated Extract, Transform, and Load (ETL) data pipeline via AWS Glue, and establishing time-based scheduling mechanisms using Amazon EventBridge.
 
 ---
 
-### Objectives for the Day
+### Objectives for the Week
 
 - Provision and configure a secure, production-optimized **Amazon RDS PostgreSQL** relational database.
 - Build an automated **ETL (Extract, Transform, Load)** pipeline with **AWS Glue** to crawl, clean, and ingest raw S3 datasets into the database.
@@ -94,7 +94,7 @@ aws events describe-rule --name daily-etl-schedule-rule \
 
 ---
 
-### Day 3 Key Takeaways
+### Week 3 Key Takeaways
 
 1. **Database Network Isolation Principle:** Relational databases should never be exposed directly to the public internet (`Publicly Accessible = No`). Restricting access strictly to internal Security Groups belonging to the EC2 application layer or the Glue ETL environment effectively minimizes the network attack surface.
 2. **The Power of Centralized Metadata:** The AWS Glue Data Catalog serves as an essential central data dictionary. It allows indexing of vast data structures sitting on S3 without moving the actual data files, keeping subsequent analytical and ML workloads structured and highly organized.

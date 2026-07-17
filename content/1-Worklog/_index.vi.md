@@ -1,6 +1,6 @@
 ---
 title: "Nhật ký làm việc"
-date: 2026-06-08
+date: 2026-07-14
 weight: 1
 chapter: false
 pre: " <b> 1. </b> "
@@ -12,8 +12,8 @@ Chương trình kéo dài khoảng **3 tháng** (từ ngày 20/04 đến ngày 1
 
 ---
 
-**Ngày 1 - 15/05/2026**: [Xây Dựng & Huấn Luyện Mô Hình Với SageMaker, Lưu Trữ Dữ Liệu Trên S3 Và Triển Khai API Trên EC2](1.1-Day1/)
+**Tuần 1 - 15/05/2026**: [Xây Dựng & Huấn Luyện Mô Hình Với SageMaker, Lưu Trữ Dữ Liệu Trên S3 Và Triển Khai API Trên EC2](1.1-Week01/)
 
-**Ngày 2 - 22/05/2026**: [Tối Ưu Phân Phối Tốc Độ Cao Với CloudFront, Điều Hướng Lưu Lượng Bằng ALB Và Tự Động Mở Rộng Hệ Thống Với Auto Scaling](1.2-Day2/)
+**Tuần 2 - 22/05/2026**: [Tối Ưu Phân Phối Tốc Độ Cao Với CloudFront, Điều Hướng Lưu Lượng Bằng ALB Và Tự Động Mở Rộng Hệ Thống Với Auto Scaling](1.2-Week02/)
 
-**Ngày 3 - 25/05/2026**: [Khởi Tạo Cơ Sở Dữ Liệu RDS Postgres, Tự Động Hóa Biến Đổi Dữ Liệu Với AWS Glue Và Lập Lịch Cron Job Bằng EventBridge](1.3-Day3/)
+**Tuần 3 - 25/05/2026**: [Khởi Tạo Cơ Sở Dữ Liệu RDS Postgres, Tự Động Hóa Biến Đổi Dữ Liệu Với AWS Glue Và Lập Lịch Cron Job Bằng EventBridge](1.3-Week03/)

@@ -244,4 +244,4 @@ def lambda_handler(event, context):
 
 #### Verification on AWS Console:
 
-![Lambda API](/images/5-Workshop/5.6-Model-api/lambda-api.png)
+![Lambda API](/images/5-Workshop/5.6-Model-API/lambda-api.png)

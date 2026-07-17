@@ -1,5 +1,5 @@
 ---
-title: "Day 2"
+title: "Week 2"
 date: 2026-05-22
 weight: 2
 chapter: false
@@ -8,11 +8,11 @@ pre: " <b> 1.2. </b> "
 
 # Work Log: High-Performance Distribution with CloudFront, Traffic Routing via ALB, and Dynamic Scalability with Auto Scaling
 
-> **Day 2 - Friday, May 22, 2026:** Upgraded the single-instance API infrastructure from Day 1 into a highly available (High Availability) and auto-scaling architecture. Configured an Application Load Balancer (ALB), established an Auto Scaling Group for EC2 instances, and optimized global response latency using the AWS CloudFront content delivery network.
+> **Week 2 - Friday, May 22, 2026:** Upgraded the single-instance API infrastructure from Day 1 into a highly available (High Availability) and auto-scaling architecture. Configured an Application Load Balancer (ALB), established an Auto Scaling Group for EC2 instances, and optimized global response latency using the AWS CloudFront content delivery network.
 
 ---
 
-### Objectives for the Day
+### Objectives for the Week
 
 - Implement an **Application Load Balancer (ALB)** to distribute API incoming traffic evenly across backend virtual servers.
 - Configure an **Auto Scaling Group (ASG)** coupled with Launch Templates to dynamically scale EC2 instances based on real-time application load.
@@ -106,7 +106,7 @@ aws autoscaling describe-scaling-activities \
 
 ---
 
-### Day 2 Key Takeaways
+### Week 2 Key Takeaways
 
 1. **Stateless Architecture Priority:** For Auto Scaling groups to execute successfully, application servers must remain entirely stateless. Offloading the heavy model assets (`model.tar.gz`) to S3 on Day 1 allowed newly spawned EC2 nodes to launch smoothly without local data binding errors.
 2. **ALB & ASG Symbiosis:** This combination forms the backbone of infrastructure resilience. Manually terminating an EC2 instance proved that the ALB health checks quickly drop unhealthy nodes, while the ASG initiates a self-healing process to bring the fleet back up to capacity within minutes.

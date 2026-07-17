@@ -1,5 +1,5 @@
 ---
-title: "Ngày 3"
+title: "Tuần 3"
 date: 2026-05-25
 weight: 3
 chapter: false
@@ -8,11 +8,11 @@ pre: " <b> 1.3. </b> "
 
 # Nhật Ký Làm Việc: Khởi Tạo Cơ Sở Dữ Liệu RDS Postgres, Tự Động Hóa Biến Đổi Dữ Liệu Với AWS Glue Và Lập Lịch Cron Job Bằng EventBridge
 
-> **Ngày 3 - Thứ Hai, ngày 25/05/2026:** Tập trung xây dựng lớp lưu trữ dữ liệu có cấu trúc bằng Amazon RDS Postgres, thiết kế đường ống trích xuất và biến đổi dữ liệu (ETL) tự động thông qua AWS Glue, và thiết lập cơ chế kích hoạt theo lịch trình thời gian sử dụng Amazon EventBridge.
+> **Tuần 3 - Thứ Hai, ngày 25/05/2026:** Tập trung xây dựng lớp lưu trữ dữ liệu có cấu trúc bằng Amazon RDS Postgres, thiết kế đường ống trích xuất và biến đổi dữ liệu (ETL) tự động thông qua AWS Glue, và thiết lập cơ chế kích hoạt theo lịch trình thời gian sử dụng Amazon EventBridge.
 
 ---
 
-### Mục tiêu học tập trong ngày
+### Mục tiêu học tập trong tuần
 
 - Khởi tạo và cấu hình một cơ sở dữ liệu quan hệ **Amazon RDS PostgreSQL** bảo mật và tối ưu cho ứng dụng.
 - Xây dựng quy trình **ETL (Extract, Transform, Load)** với **AWS Glue** để tự động thu thập và biến đổi dữ liệu thô từ S3 trước khi nạp vào database.
@@ -94,7 +94,7 @@ aws events describe-rule --name daily-etl-schedule-rule \
 
 ---
 
-### Bài học rút ra từ Ngày 3
+### Bài học rút ra từ Tuần 3
 
 1. **Nguyên tắc cô lập cơ sở dữ liệu:** Tuyệt đối không để cơ sở dữ liệu RDS tiếp xúc trực tiếp với Internet công cộng (`Publicly Accessible = No`). Chỉ cho phép truy cập thông qua Security Group nội bộ từ EC2 hoặc Glue giúp thu hẹp tối đa bề mặt tấn công mạng.
 2. **Sức mạnh của Meta-data:** AWS Glue Data Catalog đóng vai trò cực kỳ quan trọng như một cuốn từ điển dữ liệu trung tâm. Nó giúp lập chỉ mục cấu hình dữ liệu trên S3 mà không cần di chuyển dữ liệu thật, giúp các tác vụ phân tích và huấn luyện ML sau này trở nên rõ ràng và có cấu trúc.
