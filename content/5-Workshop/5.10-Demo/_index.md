@@ -6,13 +6,22 @@ chapter : false
 pre : " <b> 5.10. </b> "
 ---
 
+### Project Demo
+
+Here is the live demo information of the fashion demand forecasting web application deployed on AWS Cloud.
+
+#### Live Demo Website:
+* **URL:** [d4032equ6gf0o.cloudfront.net](https://d4032equ6gf0o.cloudfront.net)
+* **Account:** `director`
+* **Password:** `password123`
+
+---
+
 ### Project Demo Video
 
-Here is the live demo video of the fashion demand forecasting web application deployed on AWS Cloud.
+You can watch or download the demo video using the link below:
 
-You can watch or download the video using the link below:
-
-- **Google Drive Video Link:** [Video DEMO.mp4](https://drive.google.com/file/d/12hmmlfS411ktxYFR1H6hzErBIxVyU7e3/view?usp=sharing)
+* **Google Drive Video Link:** [Video DEMO.mp4](https://drive.google.com/file/d/12hmmlfS411ktxYFR1H6hzErBIxVyU7e3/view?usp=sharing)
 
 #### Embedded Video Player:
 

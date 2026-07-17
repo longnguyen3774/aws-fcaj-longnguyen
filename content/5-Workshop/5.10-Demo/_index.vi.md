@@ -6,13 +6,22 @@ chapter : false
 pre : " <b> 5.10. </b> "
 ---
 
-### Video Demo Dự Án
+### Bản Demo Dự Án
 
-Dưới đây là video demo chạy thực tế của ứng dụng dự báo nhu cầu sản phẩm thời trang được triển khai trên AWS Cloud.
+Dưới đây là thông tin chạy thực tế của ứng dụng dự báo nhu cầu sản phẩm thời trang được triển khai trên AWS Cloud.
+
+#### Trang web chạy Demo:
+* **URL:** [d4032equ6gf0o.cloudfront.net](https://d4032equ6gf0o.cloudfront.net)
+* **Tài khoản:** `director`
+* **Mật khẩu:** `password123`
+
+---
+
+### Video Demo Dự Án
 
 Bạn có thể xem trực tiếp hoặc tải xuống video qua liên kết dưới đây:
 
-- **Link xem video trên Google Drive:** [Video DEMO.mp4](https://drive.google.com/file/d/12hmmlfS411ktxYFR1H6hzErBIxVyU7e3/view?usp=sharing)
+* **Link xem video trên Google Drive:** [Video DEMO.mp4](https://drive.google.com/file/d/12hmmlfS411ktxYFR1H6hzErBIxVyU7e3/view?usp=sharing)
 
 #### Trình phát video tích hợp (Embedded Player):
 
