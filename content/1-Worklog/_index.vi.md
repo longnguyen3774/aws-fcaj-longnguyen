@@ -12,7 +12,7 @@ Chương trình kéo dài khoảng **3 tháng** (từ ngày 20/04 đến ngày 1
 
 ---
 
-**Tuần 1**: [Kiến Trúc Mạng Bản Địa Đám Mây, Khởi Tạo Phân Phố Topo Amazon VPC & Thiết Lập Cổng NAT Gateway Cho Private Subnet](1.1-Week01/)
+**Tuần 1**: [Kiến Trúc Mạng Bản Địa Đám Mây, Khởi Tạo Amazon VPC Topology & Thiết Lập Cổng NAT Gateway Cho Private Subnet](1.1-Week01/)
 
 **Tuần 2**: [Chiến Lược Phân Quyền Hạn Đặc Quyền Tối Thiểu AWS IAM, Cô Lập Nhóm Bảo Mật Đa Tầng & Kiểm Toán Hệ Thống Bằng VPC Flow Logs](1.2-Week02/)
 
