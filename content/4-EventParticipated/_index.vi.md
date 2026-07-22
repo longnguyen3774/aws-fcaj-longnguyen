@@ -11,7 +11,7 @@ Trong quá trình thực tập, em đã tham gia 2 events, với mỗi event là
 ### [Event 1](4.1-Event1/)
 &emsp;**Tên sự kiện:** AWS FIRST CLOUD AI JOURNEY MEET UP
 
-&emsp;**Thời gian:** 09:00, Thứ Bảy ngày 06/06/2026
+&emsp;**Thời gian:** 09:00, Thứ Bảy, ngày 06/06/2026
 
 &emsp;**Địa điểm:** Tầng 26, tòa nhà Bitexco, số 02 đường Hải Triều, phường Sài Gòn, thành phố Hồ Chí Minh
 

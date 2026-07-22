@@ -18,17 +18,17 @@ Below is the detailed step-by-step guide to initialize the business database usi
 
 ![RDS Dashboard](/images/5-Workshop/5.3-Database-Setup/5.3.1-step02-rds-dashboard.png)
 
-3. Select the **Standard create** method to customize detailed configurations.
+3. Select the **Full configuration** method to customize detailed configurations.
 
-![Select Standard Create](/images/5-Workshop/5.3-Database-Setup/5.3.1-step03-standard-create.png)
+![Select Full configuration](/images/5-Workshop/5.3-Database-Setup/5.3.1-step03-standard-create.png)
 
-4. Select the Engine type as **PostgreSQL** and choose the appropriate default version (e.g. PostgreSQL 15.18-R1).
+4. Select the Engine type as **PostgreSQL**.
 
 ![Select PostgreSQL Engine](/images/5-Workshop/5.3-Database-Setup/5.3.1-step04-engine-postgresql.png)
 
-5. Select the Template as **Free Tier** to ensure cost optimization and use free tier resources.
+5. Select the Template as **Sandbox** to ensure cost optimization and use free tier resources.
 
-![Select Free Tier Template](/images/5-Workshop/5.3-Database-Setup/5.3.1-step05-template-freetier.png)
+![Select Sandbox Template](/images/5-Workshop/5.3-Database-Setup/5.3.1-step05-template-freetier.png)
 
 6. Under the Settings section, enter the DB instance identifier as `fashion-rds` and configure the administrative master username as `dbadmin`.
 
